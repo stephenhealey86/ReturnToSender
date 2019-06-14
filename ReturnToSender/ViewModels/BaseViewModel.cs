@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReturnToSender.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -22,6 +23,13 @@ namespace ReturnToSender.ViewModels
         {
             get { return title; }
             set { SetProperty(ref title, value); }
+        }
+
+        Theme theme = new Theme();
+        public Theme Theme
+        {
+            get { return theme; }
+            set { SetProperty(ref theme, value); }
         }
 
         protected bool SetProperty<T>(ref T backingStore, T value,

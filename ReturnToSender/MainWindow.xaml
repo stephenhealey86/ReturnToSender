@@ -4,9 +4,102 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ReturnToSender"
+        xmlns:models="clr-namespace:ReturnToSender.Models"
+        xmlns:fa="http://schemas.fontawesome.com/icons/"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="450" Width="800">
-    <Grid>
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Title="{Binding Title}" Height="450" Width="800"
+        WindowStyle="None">
+
+    <!--Custom Window Style-->
+    <Window.Resources>
+        <Style x:Key="CustomWindowStyle" TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type local:MainWindow}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Window Title -->
+                            <Grid Grid.Row="0" Background="{Binding Theme.BackGround, FallbackValue={x:Static models:ThemeDefault.BackGround}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <!--System button-->
+                                <Button
+                                    Grid.Column="0"
+                                    Style="{StaticResource SystemIconButton}"
+                                    Command="{Binding MenuCommand}"
+                                    Background="{Binding Theme.BackGround, FallbackValue={x:Static models:ThemeDefault.BackGround}}">
+                                    <fa:FontAwesome Icon="Solid_Reply" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                </Button>
+                                
+                                <!--Title-->
+                                <TextBlock Grid.Column="0" Grid.ColumnSpan="3" VerticalAlignment="Bottom" TextAlignment="Center" 
+                       Padding="10" 
+                       Text="{Binding RelativeSource=
+                                     {RelativeSource TemplatedParent}, Path=Title}"
+                                           FontSize="{StaticResource FontSizeRegular}"
+                                           Foreground="{StaticResource WordPurpleBrush}" />
+
+                                <!--Window Buttons-->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <Button Style="{StaticResource WindowControlButton}" Command="{Binding MinimizeCommand}">
+                                        <fa:FontAwesome Icon="Regular_WindowMinimize" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                    </Button>
+                                    <Button Style="{StaticResource WindowControlButton}" Command="{Binding MaximizeCommand}">
+                                        <fa:FontAwesome Icon="Solid_WindowMaximize" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                    </Button>
+                                    <Button Style="{StaticResource WindowCloseButton}" Content="&#x2717;" Command="{Binding CloseCommand}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Grid.Row="1" Background="{StaticResource WordPurpleBrush}" Height="1" />
+
+                            <!-- This is the ContentPresenter that displays the window content. -->
+                            <Border Margin="0" Grid.Row="2" >
+                                <ContentPresenter Content="{TemplateBinding Content}" />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!--Enables resize and drag etc-->
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="-1"
+        ResizeBorderThickness="4"
+        CaptionHeight="36"/>
+    </WindowChrome.WindowChrome>
+
+    <!--Window Content-->
+    <Grid Background="{Binding Theme.BackGround, FallbackValue={x:Static models:ThemeDefault.BackGround}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!--Menu Bar-->
+        <Border Grid.Row="0" BorderThickness="0" BorderBrush="{StaticResource BackgroundLightBrush}">
+            <DockPanel>
+                <Menu Background="{Binding Theme.BackGround}"
+                      BorderThickness="0"
+                      ItemsSource="{Binding MenuConstants}" />
+            </DockPanel>
+        </Border>
+
+        <!--Content-->
         
     </Grid>
+
 </Window>

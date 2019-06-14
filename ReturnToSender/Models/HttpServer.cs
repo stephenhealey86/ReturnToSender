@@ -11,6 +11,8 @@ namespace ReturnToSender.Models
     class HttpServer
     {
         #region Private Variables
+        private const string baseAddress = "http://localhost/";
+        private string path;
         private HttpListener httpListener;
         private HttpListenerContext context;
         private HttpListenerRequest request;
@@ -21,13 +23,15 @@ namespace ReturnToSender.Models
 
         #region Public Variables
         public bool Stop { get; set; } = false;
+        public string Response { get; set; }
         #endregion
 
         #region Constructors
         public HttpServer(string Uri)
         {
             httpListener = new HttpListener();
-            httpListener.Prefixes.Add(Uri);
+            path = Uri;
+            httpListener.Prefixes.Add(baseAddress + path);
         }
         #endregion
 
@@ -35,35 +39,48 @@ namespace ReturnToSender.Models
         /// <summary>
         /// Starts the Http server
         /// </summary>
-        /// <returns>True if has atleast one Uri</returns>
         public async Task Start()
         {
-            if (httpListener.Prefixes.Count > 0)
+            if (httpListener.Prefixes.Count > 0 && Response.Length  > 0)
             {
                 // Start the Http Listener
                 httpListener.Start();
                 while (!Stop)
                 {
-                    // Wait for Http request
-                    context = await httpListener.GetContextAsync();
-                    request = context.Request;
-                    // Obtain a response object.
-                    response = context.Response;
-                    // Get a response stream and write the response to it.
-                    response.ContentLength64 = buffer.Length;
-                    output = response.OutputStream;
-                    output.Write(buffer, 0, buffer.Length);
-                    // Close the output stream.
-                    output.Close();
+                    try
+                    {
+                        // Wait for Http request
+                        context = await httpListener.GetContextAsync();
+                        request = context.Request;
+                        // Obtain a response object.
+                        response = context.Response;
+                        var one = request.RawUrl.ToLower().Trim('/');
+                        var two = path.ToLower().Trim('/');
+                        if (!String.Equals(one, two) || one.Length != two.Length)
+                        {
+                            response.StatusCode = (int)HttpStatusCode.NotFound;
+                            buffer = Encoding.UTF8.GetBytes("Not Found");
+                        }
+                        else
+                        {
+                            buffer = Encoding.UTF8.GetBytes(Response);
+                        }
+                        // Get a response stream and write the response to it.
+                        response.ContentLength64 = buffer.Length;
+                        output = response.OutputStream;
+                        output.Write(buffer, 0, buffer.Length);
+                        // Close the output stream.
+                        output.Close();
+                    }
+                    catch (Exception e)
+                    {
+
+                        throw;
+                    }
                 }
                 // Stop the Http Listener
                 httpListener.Stop();
             }
-        }
-
-        public void AddResponse(string res)
-        {
-            buffer = Encoding.UTF8.GetBytes(res);
         }
         #endregion
 
