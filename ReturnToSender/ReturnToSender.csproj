@@ -67,7 +67,9 @@
     <Compile Include="AttachedProperties\BaseAttachedProperty.cs" />
     <Compile Include="AttachedProperties\ButtonAttachedProperty.cs" />
     <Compile Include="CustomControls\MyMenuItem.cs" />
+    <Compile Include="Models\MenuHeaders.cs" />
     <Compile Include="Models\Themes.cs" />
+    <Compile Include="ValueConvertors\BaseMultiValueConverter.cs" />
     <Compile Include="ValueConvertors\BaseValueConverter.cs" />
     <Compile Include="ValueConvertors\BoolToVisibilityConvertor.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
@@ -86,6 +88,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Styles\Menu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Styles\Buttons.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

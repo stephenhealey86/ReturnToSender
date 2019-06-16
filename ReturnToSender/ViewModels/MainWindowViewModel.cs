@@ -20,7 +20,7 @@ namespace ReturnToSender.ViewModels
         #endregion
 
         #region Public Variables
-        public List<MyMenuItem> MenuConstants { get; set; }
+        public List<MyMenuItem> AppMenus { get; set; }
         #endregion
 
         #region Commands
@@ -79,32 +79,32 @@ namespace ReturnToSender.ViewModels
             MenuCommand = new RelayCommand(() => ShowSystemMenu());
 
             // Menu Buttons
-            ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));            
+            ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
 
-            MenuConstants = new List<MyMenuItem>()
+            AppMenus = new List<MyMenuItem>()
             {
                 new MyMenuItem()
                 {
-                    Header = "File",
+                    Header = MenuHeaders.File,
                     ItemsSource = new List<MyMenuItem>()
                     {
                         new MyMenuItem()
                         {
-                            Header = "New"
+                            Header = MenuHeaders.New
                         },
                         new MyMenuItem()
                         {
-                            Header = "Open"
+                            Header = MenuHeaders.Open
                         },
                         new MyMenuItem()
                         {
-                            Header = "Save"
+                            Header = MenuHeaders.Save
                         }
                     }
                 },
                 new MyMenuItem()
                 {
-                    Header = "Theme",
+                    Header = ThemeTypes.Theme,
                     ItemsSource = new List<MyMenuItem>()
                     {
                         new MyMenuItem()
@@ -124,12 +124,17 @@ namespace ReturnToSender.ViewModels
                             Header = ThemeTypes.Planet,
                             Command = ThemeCommand,
                             CommandParameter = ThemeTypes.Planet
+                        },
+                        new MyMenuItem()
+                        {
+                            Header = ThemeTypes.Transparent,
+                            Command = ThemeCommand,
+                            CommandParameter = ThemeTypes.Transparent
                         }
                     }
                 }
             };
-
-            OnPropertyChanged(nameof(MenuConstants));
+            OnPropertyChanged(nameof(AppMenus));
         }
         #endregion
 

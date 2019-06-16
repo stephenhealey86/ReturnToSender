@@ -13,24 +13,13 @@ namespace ReturnToSender.CustomControls
 {
     public class MyMenuItem : MenuItem
     {
-        protected override void OnMouseEnter(MouseEventArgs e)
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            base.OnMouseEnter(e);
-            IsHighlighted = false;
-            Background = ThemeDark.BackGround;
-        }
-
-        protected override void OnMouseDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseDown(e);
-            IsHighlighted = false;
-            Background = ThemeDark.BackGround;
-        }
-
-        protected override void OnMouseLeave(MouseEventArgs e)
-        {
-            base.OnMouseLeave(e);
-            Background = new SolidColorBrush(Colors.Blue);
+            base.OnPropertyChanged(e);
+            if (e.Property.Name == nameof(IsHighlighted))
+            {
+                IsHighlighted = false;
+            }
         }
     }
 }
