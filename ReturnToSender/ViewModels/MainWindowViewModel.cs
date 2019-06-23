@@ -1,6 +1,7 @@
 ﻿using ReturnToSender.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -19,42 +20,8 @@ namespace ReturnToSender.ViewModels
 
         #region Public Variables
         public bool ToggleMenuVisible { get; set; } = false;
-        public List<HttpServer> HttpServer;
-        public List<TabItem> Tabs
-        {
-            get
-            {
-                List<TabItem> tabs = new List<TabItem>();
-                if (HttpServer.Count > 0)
-                {
-                    foreach (HttpServer httpServer in HttpServer)
-                    {
-                        tabs.Add(new TabItem()
-                        {
-                            Header = httpServer.Request.Length > 8 ? httpServer.Request.Substring(0, 5) + "..." : httpServer.Request,
-                            Foreground = Theme.ForeGround,
-                            Background = Theme.BackGround,
-                            Content = new TabContent()
-                            {
-                                Text = "CouBear"
-                            }
-                        });
-                        //tabs[0].IsSelected = true;
-                    }
-                }
-                else
-                {
-                    tabs.Add(new TabItem()
-                    {
-                        Foreground = Theme.ForeGround,
-                        Background = Theme.BackGround,
-                        //IsSelected = true
-                    });
-                }
-                
-                return tabs;
-            }
-        }
+        public ObservableCollection<HttpServer> HttpServer { get; set; }
+        public int SelectedTab { get; set; } = 0;
         #endregion
 
         #region Commands
@@ -87,6 +54,16 @@ namespace ReturnToSender.ViewModels
         /// The command to toggle menu
         /// </summary>
         public ICommand ToggleCommand { get; set; }
+
+        /// <summary>
+        /// The command to delete a HttpServer from the List
+        /// </summary>
+        public ICommand RemoveServerCommand { get; set; }
+
+        /// <summary>
+        /// The command to delete a HttpServer from the List
+        /// </summary>
+        public ICommand NewServerCommand { get; set; }
         #endregion
 
         #region Constructor
@@ -96,15 +73,16 @@ namespace ReturnToSender.ViewModels
             Title = "ReturnToSender";
             SetCommands();
             // Testing
-            HttpServer = new List<HttpServer>();
+            HttpServer = new ObservableCollection<HttpServer>();
             HttpServer.Add(new HttpServer());
             HttpServer[0].Request = "test/";
             HttpServer[0].Response = "Testing";
             Task t1 = new Task(async () => { await HttpServer[0].Start(); });
             HttpServer.Add(new HttpServer());
-            HttpServer[1].Request = "testtwo/";
+            HttpServer[1].Request = "testingtwo/";
             HttpServer[1].Response = "Testing";
             Task t2 = new Task(async () => { await HttpServer[1].Start(); });
+            OnPropertyChanged(nameof(HttpServer));
         }
         #endregion
 
@@ -121,10 +99,48 @@ namespace ReturnToSender.ViewModels
             ToggleCommand = new RelayCommand(() => ToggleCommandAction());
 
             ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
+
+            // Tab Commands
+            RemoveServerCommand = new RelayParamterCommand((param) => RemoveServerCommandAction(param));
+            NewServerCommand = new RelayCommand(() => NewServerCommandAction());
         }
         #endregion
 
         #region CommandActions
+        private void NewServerCommandAction()
+        {
+            HttpServer.Add(new HttpServer());
+            SelectedTab = HttpServer.Count - 1;
+            OnPropertyChanged(nameof(SelectedTab));
+            OnPropertyChanged(nameof(HttpServer));
+        }
+
+        private void RemoveServerCommandAction(object param)
+        {
+            var str = (string)param;
+            if (str != null)
+            {
+                HttpServer.Remove(HttpServer.FirstOrDefault(x => x.Request == str));
+                OnPropertyChanged(nameof(HttpServer));
+            }
+            else
+            {
+                var list = new List<HttpServer>();
+                foreach (HttpServer item in HttpServer)
+                {
+                    if (item.Request == null)
+                    {
+                        list.Add(item);
+                    }
+                }
+                foreach (HttpServer item in list)
+                {
+                    HttpServer.Remove(item);
+                }
+                OnPropertyChanged(nameof(HttpServer));
+            }
+        }
+
         private void ThemeCommandAction(object param)
         {
             var theme = param as string;
@@ -152,7 +168,6 @@ namespace ReturnToSender.ViewModels
                     break;
             }
             OnPropertyChanged(nameof(Theme));
-            OnPropertyChanged(nameof(Tabs));
         }
 
         private void ShowSystemMenu()

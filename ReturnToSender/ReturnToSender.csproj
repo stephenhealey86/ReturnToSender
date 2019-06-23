@@ -72,12 +72,12 @@
     </ApplicationDefinition>
     <Compile Include="AttachedProperties\BaseAttachedProperty.cs" />
     <Compile Include="AttachedProperties\ButtonAttachedProperty.cs" />
-    <Compile Include="Models\TabContent.cs" />
     <Compile Include="Models\Themes.cs" />
     <Compile Include="ValueConvertors\BaseMultiValueConverter.cs" />
     <Compile Include="ValueConvertors\BaseValueConverter.cs" />
     <Compile Include="ValueConvertors\BoolToVisibilityConvertor.cs" />
     <Compile Include="ValueConvertors\ColorConvertor.cs" />
+    <Compile Include="ValueConvertors\TrimStringValueConvertor.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />

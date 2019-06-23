@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:convertors="clr-namespace:ReturnToSender.ValueConvertors"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:models="clr-namespace:ReturnToSender.Models">
+    xmlns:models="clr-namespace:ReturnToSender.Models"
+    xmlns:vm="clr-namespace:ReturnToSender.ViewModels">
 
     <Style x:Name="TabButton" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
@@ -62,6 +63,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Background="{TemplateBinding Background}"
+                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.NewServerCommand}"
                             Foreground="{TemplateBinding Foreground}"
                             Style="{DynamicResource ResourceKey=TabButton}">
                             <materialDesign:PackIcon Kind="Plus" />
@@ -71,9 +73,7 @@
                             Grid.Row="1"
                             Grid.Column="0"
                             Grid.ColumnSpan="3"
-                            Background="{TemplateBinding Background,
-                                                         Converter={convertors:ColorConvertor},
-                                                         ConverterParameter=0.95}"
+                            Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.95}"
                             CornerRadius="0,10,10,10"
                             KeyboardNavigation.DirectionalNavigation="Contained"
                             KeyboardNavigation.TabIndex="2"
@@ -89,8 +89,31 @@
         </Setter>
         <Setter Property="ContentTemplate">
             <Setter.Value>
-                <DataTemplate DataType="{x:Type models:TabContent}">
-                    <Label Content="{Binding Path=Text}" />
+                <DataTemplate DataType="{x:Type models:HttpServer}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel
+                            Grid.Row="0"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                            <ComboBox
+                                Margin="10"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <ComboBoxItem Content="GET" IsSelected="True" />
+                                <ComboBoxItem Content="POST" />
+                            </ComboBox>
+                            <TextBox
+                                MinWidth="100"
+                                Margin="10"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="{Binding Request, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
@@ -109,22 +132,22 @@
                                     Margin="-20,0,0,-10"
                                     VerticalAlignment="Stretch"
                                     Data="M116.486,29.036c-23.582-8-14.821-29-42.018-29h-62.4C5.441,0.036,0,5.376,0,12.003v28.033h122v-11H116.486z"
-                                    Fill="{TemplateBinding Background,
-                                                           Converter={convertors:ColorConvertor},
-                                                           ConverterParameter=0.85}"
+                                    Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.85}"
                                     SnapsToDevicePixels="True" />
                                 <Grid>
                                     <Label
                                         Margin="-10,0,0,0"
-                                        Content="{TemplateBinding Header}"
-                                        Foreground="{TemplateBinding Foreground}" />
+                                        Content="{Binding Request, Converter={convertors:TrimStringValueConvertor}}"
+                                        Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}" />
                                     <Button
                                         Margin="0"
                                         Padding="0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
-                                        Background="{TemplateBinding Background}"
-                                        Foreground="{TemplateBinding Foreground}"
+                                        Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background}"
+                                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveServerCommand}"
+                                        CommandParameter="{Binding Request}"
+                                        Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
                                         Style="{DynamicResource ResourceKey=TabButton}">
                                         <materialDesign:PackIcon Kind="Close" />
                                     </Button>
@@ -135,7 +158,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Panel.ZIndex" Value="100" />
-                            <Setter TargetName="Border" Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.95}" />
+                            <Setter TargetName="Border" Property="Fill" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.95}" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
@@ -143,7 +166,7 @@
                                 <Condition Property="IsSelected" Value="False" />
                             </MultiTrigger.Conditions>
                             <MultiTrigger.Setters>
-                                <Setter TargetName="Border" Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.9}" />
+                                <Setter TargetName="Border" Property="Fill" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.9}" />
                             </MultiTrigger.Setters>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>

@@ -168,10 +168,12 @@
         <!--  Application Page Content  -->
         <Grid Grid.Row="1">
             <TabControl
+                Name="MyTabControl"
                 Margin="10"
                 Background="{Binding Theme.BackGround}"
                 Foreground="{Binding Theme.ForeGround}"
-                ItemsSource="{Binding Tabs}" />
+                ItemsSource="{Binding HttpServer, Mode=OneWay}"
+                SelectedIndex="{Binding SelectedTab}" />
         </Grid>
     </Grid>
 </Window>
