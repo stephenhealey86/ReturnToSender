@@ -1,5 +1,4 @@
-﻿using ReturnToSender.CustomControls;
-using ReturnToSender.Models;
+﻿using ReturnToSender.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,11 +15,46 @@ namespace ReturnToSender.ViewModels
     {
         #region Private Variables
         Window _window;
-        List<HttpServer> httpServer;
         #endregion
 
         #region Public Variables
-        public List<MyMenuItem> AppMenus { get; set; }
+        public bool ToggleMenuVisible { get; set; } = false;
+        public List<HttpServer> HttpServer;
+        public List<TabItem> Tabs
+        {
+            get
+            {
+                List<TabItem> tabs = new List<TabItem>();
+                if (HttpServer.Count > 0)
+                {
+                    foreach (HttpServer httpServer in HttpServer)
+                    {
+                        tabs.Add(new TabItem()
+                        {
+                            Header = httpServer.Request.Length > 8 ? httpServer.Request.Substring(0, 5) + "..." : httpServer.Request,
+                            Foreground = Theme.ForeGround,
+                            Background = Theme.BackGround,
+                            Content = new TabContent()
+                            {
+                                Text = "CouBear"
+                            }
+                        });
+                        //tabs[0].IsSelected = true;
+                    }
+                }
+                else
+                {
+                    tabs.Add(new TabItem()
+                    {
+                        Foreground = Theme.ForeGround,
+                        Background = Theme.BackGround,
+                        //IsSelected = true
+                    });
+                }
+                
+                return tabs;
+            }
+        }
         #endregion
 
         #region Commands
@@ -48,6 +82,11 @@ namespace ReturnToSender.ViewModels
         /// The command to change theme
         /// </summary>
         public ICommand ThemeCommand { get; set; }
+
+        /// <summary>
+        /// The command to toggle menu
+        /// </summary>
+        public ICommand ToggleCommand { get; set; }
         #endregion
 
         #region Constructor
@@ -57,15 +96,15 @@ namespace ReturnToSender.ViewModels
             Title = "ReturnToSender";
             SetCommands();
             // Testing
-            httpServer = new List<HttpServer>();
-            httpServer.Add(new HttpServer("test/"));
-            httpServer[0].Response = "Testing";
-            Task t1 = new Task(async () => { await httpServer[0].Start(); });
-            t1.Start();
-            httpServer.Add(new HttpServer("test/two/"));
-            httpServer[1].Response = "TestingTwo";
-            Task t2 = new Task(async () => { await httpServer[1].Start(); });
-            t2.Start();
+            HttpServer = new List<HttpServer>();
+            HttpServer.Add(new HttpServer());
+            HttpServer[0].Request = "test/";
+            HttpServer[0].Response = "Testing";
+            Task t1 = new Task(async () => { await HttpServer[0].Start(); });
+            HttpServer.Add(new HttpServer());
+            HttpServer[1].Request = "testtwo/";
+            HttpServer[1].Response = "Testing";
+            Task t2 = new Task(async () => { await HttpServer[1].Start(); });
         }
         #endregion
 
@@ -79,62 +118,9 @@ namespace ReturnToSender.ViewModels
             MenuCommand = new RelayCommand(() => ShowSystemMenu());
 
             // Menu Buttons
-            ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
+            ToggleCommand = new RelayCommand(() => ToggleCommandAction());
 
-            AppMenus = new List<MyMenuItem>()
-            {
-                new MyMenuItem()
-                {
-                    Header = MenuHeaders.File,
-                    ItemsSource = new List<MyMenuItem>()
-                    {
-                        new MyMenuItem()
-                        {
-                            Header = MenuHeaders.New
-                        },
-                        new MyMenuItem()
-                        {
-                            Header = MenuHeaders.Open
-                        },
-                        new MyMenuItem()
-                        {
-                            Header = MenuHeaders.Save
-                        }
-                    }
-                },
-                new MyMenuItem()
-                {
-                    Header = ThemeTypes.Theme,
-                    ItemsSource = new List<MyMenuItem>()
-                    {
-                        new MyMenuItem()
-                        {
-                            Header = ThemeTypes.Default,
-                            Command = ThemeCommand,
-                            CommandParameter = ThemeTypes.Default
-                        },
-                        new MyMenuItem()
-                        {
-                            Header = ThemeTypes.Dark,
-                            Command = ThemeCommand,
-                            CommandParameter = ThemeTypes.Dark
-                        },
-                        new MyMenuItem()
-                        {
-                            Header = ThemeTypes.Planet,
-                            Command = ThemeCommand,
-                            CommandParameter = ThemeTypes.Planet
-                        },
-                        new MyMenuItem()
-                        {
-                            Header = ThemeTypes.Transparent,
-                            Command = ThemeCommand,
-                            CommandParameter = ThemeTypes.Transparent
-                        }
-                    }
-                }
-            };
-            OnPropertyChanged(nameof(AppMenus));
+            ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
         }
         #endregion
 
@@ -144,6 +130,29 @@ namespace ReturnToSender.ViewModels
             var theme = param as string;
             Theme = ThemeTypes.GetTheme(theme);
             OnPropertyChanged(nameof(Theme));
+        }
+
+        private void ToggleCommandAction()
+        {
+            ToggleMenuVisible = ToggleMenuVisible ? false : true; OnPropertyChanged(nameof(ToggleMenuVisible));
+            var num = new Random();
+            switch (num.Next(1,5))
+            {
+                case 1:
+                    Theme = ThemeDefault.Theme;
+                    break;
+                case 2:
+                    Theme = ThemeDark.Theme;
+                    break;
+                case 3:
+                    Theme = ThemePlanet.Theme;
+                    break;
+                case 4:
+                    Theme = ThemeTransparent.Theme;
+                    break;
+            }
+            OnPropertyChanged(nameof(Theme));
+            OnPropertyChanged(nameof(Tabs));
         }
 
         private void ShowSystemMenu()

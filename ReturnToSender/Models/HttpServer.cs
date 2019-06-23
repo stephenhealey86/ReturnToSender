@@ -5,14 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace ReturnToSender.Models
 {
-    class HttpServer
+    public class HttpServer
     {
+
         #region Private Variables
-        private const string baseAddress = "http://localhost/";
-        private string path;
         private HttpListener httpListener;
         private HttpListenerContext context;
         private HttpListenerRequest request;
@@ -24,14 +24,13 @@ namespace ReturnToSender.Models
         #region Public Variables
         public bool Stop { get; set; } = false;
         public string Response { get; set; }
+        public string Request { get; set; }
         #endregion
 
         #region Constructors
-        public HttpServer(string Uri)
+        public HttpServer()
         {
             httpListener = new HttpListener();
-            path = Uri;
-            httpListener.Prefixes.Add(baseAddress + path);
         }
         #endregion
 
@@ -41,6 +40,8 @@ namespace ReturnToSender.Models
         /// </summary>
         public async Task Start()
         {
+            httpListener.Prefixes.Add(Request);
+
             if (httpListener.Prefixes.Count > 0 && Response.Length  > 0)
             {
                 // Start the Http Listener
@@ -55,7 +56,7 @@ namespace ReturnToSender.Models
                         // Obtain a response object.
                         response = context.Response;
                         var one = request.RawUrl.ToLower().Trim('/');
-                        var two = path.ToLower().Trim('/');
+                        var two = Request.ToLower().Trim('/');
                         if (!String.Equals(one, two) || one.Length != two.Length)
                         {
                             response.StatusCode = (int)HttpStatusCode.NotFound;
