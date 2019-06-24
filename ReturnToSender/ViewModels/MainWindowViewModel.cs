@@ -1,4 +1,6 @@
-﻿using ReturnToSender.Models;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using ReturnToSender.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,7 +21,6 @@ namespace ReturnToSender.ViewModels
         #endregion
 
         #region Public Variables
-        public bool ToggleMenuVisible { get; set; } = false;
         public ObservableCollection<HttpServer> HttpServer { get; set; }
         public int SelectedTab { get; set; } = 0;
         #endregion
@@ -43,17 +44,12 @@ namespace ReturnToSender.ViewModels
         /// <summary>
         /// The command to show the system menu of the window
         /// </summary>
-        public ICommand MenuCommand { get; set; }
+        public ICommand SystemMenuCommand { get; set; }
 
         /// <summary>
         /// The command to change theme
         /// </summary>
         public ICommand ThemeCommand { get; set; }
-
-        /// <summary>
-        /// The command to toggle menu
-        /// </summary>
-        public ICommand ToggleCommand { get; set; }
 
         /// <summary>
         /// The command to delete a HttpServer from the List
@@ -64,6 +60,16 @@ namespace ReturnToSender.ViewModels
         /// The command to delete a HttpServer from the List
         /// </summary>
         public ICommand NewServerCommand { get; set; }
+
+        /// <summary>
+        /// The command to check the user entered rsponse hs correct JSON syntax
+        /// </summary>
+        public ICommand VerifyJsonCommand { get; set; }
+
+        /// <summary>
+        /// The command to start the http server
+        /// </summary>
+        public ICommand StartServerCommand { get; set; }
         #endregion
 
         #region Constructor
@@ -74,15 +80,8 @@ namespace ReturnToSender.ViewModels
             SetCommands();
             // Testing
             HttpServer = new ObservableCollection<HttpServer>();
-            HttpServer.Add(new HttpServer());
-            HttpServer[0].Request = "test/";
-            HttpServer[0].Response = "Testing";
-            Task t1 = new Task(async () => { await HttpServer[0].Start(); });
-            HttpServer.Add(new HttpServer());
-            HttpServer[1].Request = "testingtwo/";
-            HttpServer[1].Response = "Testing";
-            Task t2 = new Task(async () => { await HttpServer[1].Start(); });
-            OnPropertyChanged(nameof(HttpServer));
+            NewServerCommandAction();
+            //Theme = ThemeDark.Theme;
         }
         #endregion
 
@@ -93,20 +92,60 @@ namespace ReturnToSender.ViewModels
             MinimizeCommand = new RelayCommand(() => _window.WindowState = WindowState.Minimized);
             MaximizeCommand = new RelayCommand(() => _window.WindowState ^= WindowState.Maximized);
             CloseCommand = new RelayCommand(() => _window.Close());
-            MenuCommand = new RelayCommand(() => ShowSystemMenu());
+            SystemMenuCommand = new RelayCommand(() => SystemMenuCommandAction());
 
             // Menu Buttons
-            ToggleCommand = new RelayCommand(() => ToggleCommandAction());
-
             ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
 
             // Tab Commands
             RemoveServerCommand = new RelayParamterCommand((param) => RemoveServerCommandAction(param));
             NewServerCommand = new RelayCommand(() => NewServerCommandAction());
+            VerifyJsonCommand = new RelayParamterCommand((param) => VerifyJsonCommandAction(param));
+            StartServerCommand = new RelayParamterCommand((param) => StartServerCommandAction(param));
         }
         #endregion
 
         #region CommandActions
+        /// <summary>
+        /// Starts the http server
+        /// </summary>
+        private void StartServerCommandAction(object param)
+        {
+            // Get string
+            var str = (string)param;
+            if (str != null)
+            {
+                // Remove first matching HttpServer from list and update UI
+                var http = HttpServer.FirstOrDefault(x => x.Request == str);
+                
+            }
+            OnPropertyChanged(nameof(HttpServer));
+        }
+
+        /// <summary>
+        /// Checks the textbox text is correct JSON
+        /// </summary>
+        private void VerifyJsonCommandAction(object param)
+        {
+            var str = (string)param;
+            if (str != null)
+            {
+                // Find http server
+                var http = HttpServer.FirstOrDefault(x => x.Response == str);
+                JToken jo = JToken.Parse(http.Response);
+                http.Response = jo.ToString(Formatting.Indented);
+            }
+            OnPropertyChanged(nameof(HttpServer));
+            var tabs = _window.FindName("MyTabControl") as TabControl;
+            if (tabs != null)
+            {
+                tabs.Items.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Adds a new blank HttpServer to the list
+        /// </summary>
         private void NewServerCommandAction()
         {
             HttpServer.Add(new HttpServer());
@@ -115,16 +154,23 @@ namespace ReturnToSender.ViewModels
             OnPropertyChanged(nameof(HttpServer));
         }
 
+        /// <summary>
+        /// Removes the first HttpServer from the list with a Request Uri thata matches the parameter
+        /// </summary>
+        /// <param name="param">HttpServer items Request property</param>
         private void RemoveServerCommandAction(object param)
         {
+            // Get string
             var str = (string)param;
             if (str != null)
             {
+                // Remove first matching HttpServer from list and update UI
                 HttpServer.Remove(HttpServer.FirstOrDefault(x => x.Request == str));
                 OnPropertyChanged(nameof(HttpServer));
             }
             else
             {
+                // Remove all blank HttpServers from the list and update UI
                 var list = new List<HttpServer>();
                 foreach (HttpServer item in HttpServer)
                 {
@@ -139,8 +185,17 @@ namespace ReturnToSender.ViewModels
                 }
                 OnPropertyChanged(nameof(HttpServer));
             }
+            // If the list is empty add one new blank HttpServer
+            if (HttpServer.Count == 0)
+            {
+                NewServerCommandAction();
+            }
         }
 
+        /// <summary>
+        /// Change UI theme
+        /// </summary>
+        /// <param name="param"></param>
         private void ThemeCommandAction(object param)
         {
             var theme = param as string;
@@ -148,33 +203,18 @@ namespace ReturnToSender.ViewModels
             OnPropertyChanged(nameof(Theme));
         }
 
-        private void ToggleCommandAction()
-        {
-            ToggleMenuVisible = ToggleMenuVisible ? false : true; OnPropertyChanged(nameof(ToggleMenuVisible));
-            var num = new Random();
-            switch (num.Next(1,5))
-            {
-                case 1:
-                    Theme = ThemeDefault.Theme;
-                    break;
-                case 2:
-                    Theme = ThemeDark.Theme;
-                    break;
-                case 3:
-                    Theme = ThemePlanet.Theme;
-                    break;
-                case 4:
-                    Theme = ThemeTransparent.Theme;
-                    break;
-            }
-            OnPropertyChanged(nameof(Theme));
-        }
-
-        private void ShowSystemMenu()
+        /// <summary>
+        /// Displays the system menu
+        /// </summary>
+        private void SystemMenuCommandAction()
         {
             var x = _window.Left;
             var y = _window.Top;
-            SystemCommands.ShowSystemMenu(_window, new Point(x, y));
+            if (_window.WindowState == WindowState.Maximized)
+            {
+                x = 0; y = -5;
+            }
+            SystemCommands.ShowSystemMenu(_window, new Point(x, y + 40));
         }
         #endregion
     }

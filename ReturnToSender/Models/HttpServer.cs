@@ -19,7 +19,6 @@ namespace ReturnToSender.Models
         private HttpListenerResponse response;
         private byte[] buffer;
         System.IO.Stream output;
-        private bool started = false;
         #endregion
 
         #region Public Variables
@@ -47,7 +46,6 @@ namespace ReturnToSender.Models
             {
                 // Start the Http Listener
                 httpListener.Start();
-                started = true;
                 while (!Stop)
                 {
                     try
@@ -83,7 +81,6 @@ namespace ReturnToSender.Models
                 }
                 // Stop the Http Listener
                 httpListener.Stop();
-                started = false;
             }
         }
         #endregion
