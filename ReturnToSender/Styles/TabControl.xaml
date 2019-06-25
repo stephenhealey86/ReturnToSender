@@ -129,6 +129,7 @@
                                 HorizontalContentAlignment="Left"
                                 materialDesign:HintAssist.Hint="Http Server Uri"
                                 Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
+                                IsReadOnly="{Binding Started}"
                                 Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
                                 Text="{Binding Request, Mode=TwoWay}" />
 
@@ -143,7 +144,7 @@
                                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Theme.Brand}"
                                 Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.StartServerCommand}"
                                 CommandParameter="{Binding Request}"
-                                Content="Start"
+                                Content="{Binding ButtonStatus, Mode=OneWay}"
                                 Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background}"
                                 Style="{DynamicResource MaterialDesignRaisedButton}" />
 
@@ -179,10 +180,12 @@
                                 Margin="10"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
+                                materialDesign:HintAssist.Hint="{Binding VerificationString}"
                                 materialDesign:TextFieldAssist.TextFieldCornerRadius="20"
                                 AcceptsReturn="True"
                                 AcceptsTab="True"
                                 Foreground="Red"
+                                IsReadOnly="{Binding Started}"
                                 Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}"
                                 Text="{Binding Response, Mode=TwoWay}"
                                 TextWrapping="Wrap" />

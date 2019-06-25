@@ -101,7 +101,17 @@ namespace ReturnToSender.ViewModels
             RemoveServerCommand = new RelayParamterCommand((param) => RemoveServerCommandAction(param));
             NewServerCommand = new RelayCommand(() => NewServerCommandAction());
             VerifyJsonCommand = new RelayParamterCommand((param) => VerifyJsonCommandAction(param));
-            StartServerCommand = new RelayParamterCommand((param) => StartServerCommandAction(param));
+            StartServerCommand = new RelayParamterCommand(async (param) => await StartServerCommandAction(param));
+        }
+
+        private void Refresh()
+        {
+            OnPropertyChanged(nameof(HttpServer));
+            var tabs = _window.FindName("MyTabControl") as TabControl;
+            if (tabs != null)
+            {
+                tabs.Items.Refresh();
+            }
         }
         #endregion
 
@@ -109,7 +119,7 @@ namespace ReturnToSender.ViewModels
         /// <summary>
         /// Starts the http server
         /// </summary>
-        private void StartServerCommandAction(object param)
+        private async Task StartServerCommandAction(object param)
         {
             // Get string
             var str = (string)param;
@@ -117,9 +127,19 @@ namespace ReturnToSender.ViewModels
             {
                 // Remove first matching HttpServer from list and update UI
                 var http = HttpServer.FirstOrDefault(x => x.Request == str);
-                
+                if (http.Started)
+                {
+                    http.Stop = true;
+                    http.Started = false;
+                }
+                else
+                {
+                    http.Started = true;
+                    Refresh();
+                    await http.Start();
+                }
+                Refresh();
             }
-            OnPropertyChanged(nameof(HttpServer));
         }
 
         /// <summary>
@@ -128,19 +148,20 @@ namespace ReturnToSender.ViewModels
         private void VerifyJsonCommandAction(object param)
         {
             var str = (string)param;
-            if (str != null)
+            var http = HttpServer.FirstOrDefault(x => x.Response == str);
+            // Find http server
+            try
             {
-                // Find http server
-                var http = HttpServer.FirstOrDefault(x => x.Response == str);
                 JToken jo = JToken.Parse(http.Response);
                 http.Response = jo.ToString(Formatting.Indented);
+                http.VerificationString = "JSON Verified";
             }
-            OnPropertyChanged(nameof(HttpServer));
-            var tabs = _window.FindName("MyTabControl") as TabControl;
-            if (tabs != null)
+            catch (Exception)
             {
-                tabs.Items.Refresh();
+                // Not verified
+                http.VerificationString = "JSON Not Verified";
             }
+            Refresh();
         }
 
         /// <summary>
@@ -165,7 +186,9 @@ namespace ReturnToSender.ViewModels
             if (str != null)
             {
                 // Remove first matching HttpServer from list and update UI
-                HttpServer.Remove(HttpServer.FirstOrDefault(x => x.Request == str));
+                var http = HttpServer.FirstOrDefault(x => x.Request == str);
+                http.Stop = true;
+                HttpServer.Remove(http);
                 OnPropertyChanged(nameof(HttpServer));
             }
             else
