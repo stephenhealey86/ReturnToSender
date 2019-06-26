@@ -106,6 +106,20 @@
                                 Style="{DynamicResource ResourceKey=TabButton}">
                                 <materialDesign:PackIcon Kind="FolderOpen" />
                             </Button>
+
+                            <!--  Theme Button  -->
+                            <Button
+                                Margin="0"
+                                Padding="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Background="{TemplateBinding Background}"
+                                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.ThemeCommand}"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.IsBusy, Converter={convertors:InvertBoolValueConvertor}}"
+                                Style="{DynamicResource ResourceKey=TabButton}">
+                                <materialDesign:PackIcon Kind="Settings" />
+                            </Button>
                         </StackPanel>
 
                         <!--  Tab Content  -->

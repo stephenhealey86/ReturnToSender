@@ -10,18 +10,18 @@ namespace ReturnToSender.Models
         public const string Planet = "Planet";
         public const string Transparent = "Transparent";
 
-        public static Theme GetTheme(string str)
+        public static Theme GetTheme(int num)
         {
             Theme theme = new Theme();
-            switch (str)
+            switch (num)
             {
-                case ThemeTypes.Dark:
+                case 1:
                     theme = ThemeDark.Theme;
                     break;
-                case ThemeTypes.Planet:
+                case 2:
                     theme = ThemePlanet.Theme;
                     break;
-                case ThemeTypes.Transparent:
+                case 3:
                     theme = ThemeTransparent.Theme;
                     break;
                 default:

@@ -23,6 +23,7 @@ namespace ReturnToSender.ViewModels
     {
         #region Private Variables
         Window _window;
+        private int CurrentTheme;
         #endregion
 
         #region Public Variables
@@ -99,8 +100,7 @@ namespace ReturnToSender.ViewModels
             Title = "ReturnToSender";
             SetCommands();
             HttpServer = new ObservableCollection<HttpServer>();
-            NewServerCommandAction();
-            //Theme = ThemeDark.Theme;
+            GetUserSettings();
         }
         #endregion
 
@@ -110,11 +110,11 @@ namespace ReturnToSender.ViewModels
             // Caption Buttons
             MinimizeCommand = new RelayCommand(() => _window.WindowState = WindowState.Minimized);
             MaximizeCommand = new RelayCommand(() => _window.WindowState ^= WindowState.Maximized);
-            CloseCommand = new RelayCommand(() => _window.Close());
+            CloseCommand = new RelayCommand(() => CloseCommandAction());
             SystemMenuCommand = new RelayCommand(() => SystemMenuCommandAction());
 
             // Menu Buttons
-            ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
+            ThemeCommand = new RelayCommand(() => ThemeCommandAction());
             SaveFileCommand = new RelayCommand(async () => await SaveFileCommandAction());
             OpenFileCommand = new RelayCommand(async () => await OpenFileCommandAction());
 
@@ -231,9 +231,62 @@ namespace ReturnToSender.ViewModels
             }
             Refresh();
         }
+
+        private string ObjectToJsonString(object obj)
+        {
+            var jsonObject = JsonConvert.SerializeObject(obj);
+            JToken jo = JToken.Parse(jsonObject);
+            jsonObject = jo.ToString(Newtonsoft.Json.Formatting.Indented);
+            return jsonObject;
+        }
+
+        private void GetUserSettings()
+        {
+            var jsonObject = (string)Properties.Settings.Default["Servers"];
+            if (jsonObject != null)
+            {
+                try
+                {
+                    HttpServer = JsonConvert.DeserializeObject<ObservableCollection<HttpServer>>(jsonObject);
+                    if (HttpServer.Count == 0)
+                    {
+                        throw new Exception("Settings are empty.");
+                    }
+                }
+                catch (Exception)
+                {
+                    NewServerCommandAction();
+                }
+            }
+            var theme = (int)Properties.Settings.Default["Theme"];
+            if (true)
+            {
+                CurrentTheme = theme;
+                Theme = ThemeTypes.GetTheme(CurrentTheme);
+                OnPropertyChanged(nameof(Theme));
+            }
+            Refresh();
+        }
         #endregion
 
         #region CommandActions
+        /// <summary>
+        /// Closes the window
+        /// </summary>
+        private void CloseCommandAction()
+        {
+            foreach (HttpServer server in HttpServer)
+            {
+                server.Stop = true;
+            }
+            Refresh();
+            var jsonObject = ObjectToJsonString(HttpServer);
+            Properties.Settings.Default["Servers"] = jsonObject;
+            Properties.Settings.Default["Theme"] = CurrentTheme;
+            Properties.Settings.Default.Save();
+            _window.Close();
+        }
+
         /// <summary>
         /// Populates the HttpServer list from json file
         /// </summary>
@@ -279,9 +332,7 @@ namespace ReturnToSender.ViewModels
         {
             IsBusy = true;
             // Create json string from HttpServer and format
-            var jsonObject = JsonConvert.SerializeObject(HttpServer);
-            JToken jo = JToken.Parse(jsonObject);
-            jsonObject = jo.ToString(Newtonsoft.Json.Formatting.Indented);
+            var jsonObject = ObjectToJsonString(HttpServer);
             if (jsonObject.Length > 0)
             {
                 // Open windows save dialog
@@ -419,11 +470,11 @@ namespace ReturnToSender.ViewModels
         /// <summary>
         /// Change UI theme
         /// </summary>
-        /// <param name="param"></param>
-        private void ThemeCommandAction(object param)
+        private void ThemeCommandAction()
         {
-            var theme = param as string;
-            Theme = ThemeTypes.GetTheme(theme);
+            CurrentTheme++;
+            CurrentTheme = CurrentTheme > 3 ? 0 : CurrentTheme;
+            Theme = ThemeTypes.GetTheme(CurrentTheme);
             OnPropertyChanged(nameof(Theme));
         }
 
