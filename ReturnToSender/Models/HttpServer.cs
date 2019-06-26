@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,9 +99,8 @@ namespace ReturnToSender.Models
                         // Obtain a response object.
                         response = context.Response;
                         response.ContentType = ContentType;
-                        var one = request.Url.AbsoluteUri.ToLower().Trim('/');
-                        var two = Request.ToLower().Trim('/');
-                        if (!String.Equals(one, two) || one.Length != two.Length)
+                        var uriPath = request.Url.AbsolutePath.ToLower().Trim('/');
+                        if (!Request.ToLower().Trim('/').EndsWith(uriPath))
                         {
                             response.StatusCode = (int)HttpStatusCode.NotFound;
                             buffer = Encoding.UTF8.GetBytes("Not Found");

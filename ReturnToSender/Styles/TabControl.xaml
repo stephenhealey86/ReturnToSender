@@ -190,7 +190,8 @@
                                 Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
                                 IsReadOnly="{Binding Started}"
                                 Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
-                                Text="{Binding Request, Mode=TwoWay}" />
+                                Text="{Binding Request, Mode=TwoWay}"
+                                ToolTip="Do not use localhost if accessing from a different device" />
 
                             <!--  Start Http server  -->
                             <Button

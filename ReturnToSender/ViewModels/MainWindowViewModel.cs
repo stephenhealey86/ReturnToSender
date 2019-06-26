@@ -248,6 +248,11 @@ namespace ReturnToSender.ViewModels
                 try
                 {
                     HttpServer = JsonConvert.DeserializeObject<ObservableCollection<HttpServer>>(jsonObject);
+                    foreach (HttpServer server in HttpServer)
+                    {
+                        server.Started = false;
+                        server.Stop = false;
+                    }
                     if (HttpServer.Count == 0)
                     {
                         throw new Exception("Settings are empty.");
@@ -387,6 +392,7 @@ namespace ReturnToSender.ViewModels
                 else
                 {
                     http.Started = true;
+                    http.Stop = false;
                     Refresh();
                     try
                     {
