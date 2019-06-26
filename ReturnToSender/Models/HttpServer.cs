@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -46,7 +47,15 @@ namespace ReturnToSender.Models
         /// <summary>
         /// Indicator string for the verification button
         /// </summary>
-        public string VerificationString { get; set; } = "JSON";
+        public string VerificationString { get; set; }
+        /// <summary>
+        /// Http method choosen by user
+        /// </summary>
+        public string HttpMethod { get; set; } = "GET";
+        /// <summary>
+        /// The Http response content type
+        /// </summary>
+        public string ContentType { get; set; } = "JSON - application/json";
         #endregion
 
         #region Constructors
@@ -66,6 +75,9 @@ namespace ReturnToSender.Models
             var uri = Request.Trim('/') + ('/');
             httpListener.Prefixes.Add(uri);
 
+            // Ensure Response as value
+            Response = Response ?? "{}";
+
             if (httpListener.Prefixes.Count > 0 && Response.Length  > 0)
             {
                 // Start the Http Listener
@@ -82,8 +94,10 @@ namespace ReturnToSender.Models
                             break;
                         }
                         request = context.Request;
+                        var body = new StreamReader(context.Request.InputStream).ReadToEnd();
                         // Obtain a response object.
                         response = context.Response;
+                        response.ContentType = ContentType;
                         var one = request.Url.AbsoluteUri.ToLower().Trim('/');
                         var two = Request.ToLower().Trim('/');
                         if (!String.Equals(one, two) || one.Length != two.Length)
@@ -91,9 +105,14 @@ namespace ReturnToSender.Models
                             response.StatusCode = (int)HttpStatusCode.NotFound;
                             buffer = Encoding.UTF8.GetBytes("Not Found");
                         }
-                        else
+                        else if (request.HttpMethod == HttpMethod)
                         {
                             buffer = Encoding.UTF8.GetBytes(Response);
+                        }
+                        else
+                        {
+                            response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
+                            buffer = Encoding.UTF8.GetBytes($"Wrong Http Method, {HttpMethod} does not match {request.HttpMethod}");
                         }
                         // Get a response stream and write the response to it.
                         response.ContentLength64 = buffer.Length;

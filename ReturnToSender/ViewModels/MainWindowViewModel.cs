@@ -1,16 +1,21 @@
-﻿using Newtonsoft.Json;
+﻿using HtmlAgilityPack;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReturnToSender.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml;
 
 namespace ReturnToSender.ViewModels
 {
@@ -70,6 +75,21 @@ namespace ReturnToSender.ViewModels
         /// The command to start the http server
         /// </summary>
         public ICommand StartServerCommand { get; set; }
+
+        /// <summary>
+        /// The command for when the user changed the response content type
+        /// </summary>
+        public ICommand ContentTypeChangedCommand { get; set; }
+
+        /// <summary>
+        /// The command for saving the Http server list as a file
+        /// </summary>
+        public ICommand SaveFileCommand { get; set; }
+
+        /// <summary>
+        /// The command for generating the Http server list from a file
+        /// </summary>
+        public ICommand OpenFileCommand { get; set; }
         #endregion
 
         #region Constructor
@@ -78,7 +98,6 @@ namespace ReturnToSender.ViewModels
             _window = window;
             Title = "ReturnToSender";
             SetCommands();
-            // Testing
             HttpServer = new ObservableCollection<HttpServer>();
             NewServerCommandAction();
             //Theme = ThemeDark.Theme;
@@ -96,14 +115,19 @@ namespace ReturnToSender.ViewModels
 
             // Menu Buttons
             ThemeCommand = new RelayParamterCommand((param) => ThemeCommandAction(param));
+            SaveFileCommand = new RelayCommand(async () => await SaveFileCommandAction());
+            OpenFileCommand = new RelayCommand(async () => await OpenFileCommandAction());
 
             // Tab Commands
             RemoveServerCommand = new RelayParamterCommand((param) => RemoveServerCommandAction(param));
             NewServerCommand = new RelayCommand(() => NewServerCommandAction());
-            VerifyJsonCommand = new RelayParamterCommand((param) => VerifyJsonCommandAction(param));
+            VerifyJsonCommand = new RelayCommand(() => VerifyJsonCommandAction());
             StartServerCommand = new RelayParamterCommand(async (param) => await StartServerCommandAction(param));
         }
 
+        /// <summary>
+        /// Refreshes the item list after changes made
+        /// </summary>
         private void Refresh()
         {
             OnPropertyChanged(nameof(HttpServer));
@@ -113,9 +137,186 @@ namespace ReturnToSender.ViewModels
                 tabs.Items.Refresh();
             }
         }
+
+        private void VerifyContent(HttpServer server, string contentType)
+        {
+            switch (contentType)
+            {
+                case "JSON":
+                    try
+                    {
+                        JToken jo = JToken.Parse(server.Response);
+                        server.Response = jo.ToString(Newtonsoft.Json.Formatting.Indented);
+                        server.VerificationString = contentType + " Verified";
+                    }
+                    catch (Exception)
+                    {
+                        // Not verified
+                        server.VerificationString = contentType + " Not Verified";
+                    }
+                    break;
+
+                case "Text":
+                    if (server.Response.Length > 0)
+                    {
+                        server.VerificationString = contentType + " Verified";
+                    }
+                    else
+                    {
+                        server.VerificationString = contentType + " Not Verified";
+                    }
+                    break;
+
+                case "JavaScript":
+                    try
+                    {
+                        server.VerificationString = contentType;
+                    }
+                    catch (Exception)
+                    {
+                        
+                    }
+                    break;
+
+                case "XML":
+                    try
+                    {
+                        MemoryStream mStream = new MemoryStream();
+                        XmlTextWriter writer = new XmlTextWriter(mStream, Encoding.Unicode);
+                        XmlDocument xml = new XmlDocument();
+
+                        xml.LoadXml(server.Response);
+
+                        writer.Formatting = System.Xml.Formatting.Indented;
+
+                        // Write the XML into a formatting XmlTextWriter
+                        xml.WriteContentTo(writer);
+                        writer.Flush();
+                        mStream.Flush();
+                        mStream.Position = 0;
+
+                        server.Response = new StreamReader(mStream).ReadToEnd().ToString();
+
+                        server.VerificationString = contentType + " Verified";
+                    }
+                    catch (Exception)
+                    {
+                        server.VerificationString = contentType + " Not Verified";
+                    }
+                    break;
+
+                case "HTML":
+                    try
+                    {
+                        HtmlDocument doc = new HtmlDocument();
+                        doc.LoadHtml(server.Response);
+                        if (doc.ParseErrors != null && doc.ParseErrors.Count() > 0)
+                        {
+                            server.VerificationString = contentType + " Not Verified";
+                        }
+                        else
+                        {
+                            server.Response = doc.ParsedText;
+                            server.VerificationString = contentType + " Verified";
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        server.VerificationString = contentType + " Not Verified";
+                    }
+                    break;
+                default:
+                    server.VerificationString = null;
+                    break;
+            }
+            Refresh();
+        }
         #endregion
 
         #region CommandActions
+        /// <summary>
+        /// Populates the HttpServer list from json file
+        /// </summary>
+        /// <returns></returns>
+        private async Task OpenFileCommandAction()
+        {
+            IsBusy = true;
+            // Open windows save dialog
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.ShowDialog();
+            // Get the path name chosen by the user
+            var fullPath = openFileDialog.FileName;
+            // Get json string from file
+            // Check user didn't just close window
+            if (fullPath != null && fullPath.Length > 0)
+            {
+                try
+                {
+                    if (File.Exists(fullPath))
+                    {
+                        FileStream fileStream = File.Open(fullPath, FileMode.Open, FileAccess.Read);
+                        byte[] buffer = new byte[1028];
+                        await fileStream.ReadAsync(buffer, 0, 1028);
+                        await fileStream.FlushAsync();
+                        fileStream.Close();
+                        var jsonObject = Encoding.ASCII.GetString(buffer);
+                        HttpServer = JsonConvert.DeserializeObject<ObservableCollection<HttpServer>>(jsonObject);
+                        Refresh();
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+            IsBusy = false;
+        }
+
+        /// <summary>
+        /// Saves Http server list as a json file
+        /// </summary>
+        private async Task SaveFileCommandAction()
+        {
+            IsBusy = true;
+            // Create json string from HttpServer and format
+            var jsonObject = JsonConvert.SerializeObject(HttpServer);
+            JToken jo = JToken.Parse(jsonObject);
+            jsonObject = jo.ToString(Newtonsoft.Json.Formatting.Indented);
+            if (jsonObject.Length > 0)
+            {
+                // Open windows save dialog
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.ShowDialog();
+                // Get the path name chosen by the user
+                var fullPath = saveFileDialog.FileName;
+                // Check user didn't just close window
+                if (fullPath != null && fullPath.Length > 0)
+                {
+                    // Ensure file extension is json
+                    fullPath = Path.ChangeExtension(fullPath, null);
+                    fullPath = Path.ChangeExtension(fullPath, "json");
+                    byte[] buffer = Encoding.ASCII.GetBytes(jsonObject);
+                    FileStream fileStream;
+                    // Save file
+                    if (File.Exists(fullPath))
+                    {
+                        fileStream = File.Open(fullPath, FileMode.Truncate, FileAccess.ReadWrite);
+                        await fileStream.WriteAsync(buffer, 0, buffer.Length);
+                        await fileStream.FlushAsync();
+                        fileStream.Close();
+                    }
+                    else
+                    {
+                        fileStream = File.Create(fullPath);
+                        await fileStream.WriteAsync(buffer, 0, buffer.Length);
+                        await fileStream.FlushAsync();
+                        fileStream.Close();
+                    }
+                }
+            }
+            IsBusy = false;
+        }
+
         /// <summary>
         /// Starts the http server
         /// </summary>
@@ -136,7 +337,16 @@ namespace ReturnToSender.ViewModels
                 {
                     http.Started = true;
                     Refresh();
-                    await http.Start();
+                    try
+                    {
+                        await http.Start();
+                    }
+                    catch (Exception e)
+                    {
+                        http.Stop = false;
+                        Debug.WriteLine(e.Message);
+                        // User has stoped http server and restarted without sending request
+                    }
                 }
                 Refresh();
             }
@@ -145,23 +355,11 @@ namespace ReturnToSender.ViewModels
         /// <summary>
         /// Checks the textbox text is correct JSON
         /// </summary>
-        private void VerifyJsonCommandAction(object param)
+        private void VerifyJsonCommandAction()
         {
-            var str = (string)param;
-            var http = HttpServer.FirstOrDefault(x => x.Response == str);
-            // Find http server
-            try
-            {
-                JToken jo = JToken.Parse(http.Response);
-                http.Response = jo.ToString(Formatting.Indented);
-                http.VerificationString = "JSON Verified";
-            }
-            catch (Exception)
-            {
-                // Not verified
-                http.VerificationString = "JSON Not Verified";
-            }
-            Refresh();
+            var http = HttpServer[SelectedTab];
+            var contentType = http.ContentType.Split('-')[0].Trim();
+            VerifyContent(http, contentType);
         }
 
         /// <summary>
@@ -169,10 +367,13 @@ namespace ReturnToSender.ViewModels
         /// </summary>
         private void NewServerCommandAction()
         {
-            HttpServer.Add(new HttpServer());
-            SelectedTab = HttpServer.Count - 1;
-            OnPropertyChanged(nameof(SelectedTab));
-            OnPropertyChanged(nameof(HttpServer));
+            if (HttpServer.Count <= 9)
+            {
+                HttpServer.Add(new HttpServer());
+                SelectedTab = HttpServer.Count - 1;
+                OnPropertyChanged(nameof(SelectedTab));
+                Refresh();
+            }
         }
 
         /// <summary>

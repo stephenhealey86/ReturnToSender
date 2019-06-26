@@ -41,6 +41,9 @@
     <Reference Include="FontAwesome5.WPF, Version=1.0.11.91, Culture=neutral, PublicKeyToken=9cfaf01297a008f8, processorArchitecture=MSIL">
       <HintPath>..\packages\FontAwesome5.1.0.11\lib\net40\FontAwesome5.WPF.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.7.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.7\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -75,11 +78,15 @@
     </ApplicationDefinition>
     <Compile Include="AttachedProperties\BaseAttachedProperty.cs" />
     <Compile Include="AttachedProperties\ButtonAttachedProperty.cs" />
+    <Compile Include="AttachedProperties\SelectionChangedBehaviour.cs" />
+    <Compile Include="Models\HttpContentType.cs" />
     <Compile Include="Models\Themes.cs" />
     <Compile Include="ValueConvertors\BaseMultiValueConverter.cs" />
     <Compile Include="ValueConvertors\BaseValueConverter.cs" />
     <Compile Include="ValueConvertors\BoolToVisibilityConvertor.cs" />
     <Compile Include="ValueConvertors\ColorConvertor.cs" />
+    <Compile Include="ValueConvertors\InvertBoolValueConvertor.cs" />
+    <Compile Include="ValueConvertors\KeyValuePairValueConvertor.cs" />
     <Compile Include="ValueConvertors\TrimStringValueConvertor.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
