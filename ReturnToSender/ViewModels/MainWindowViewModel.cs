@@ -120,6 +120,9 @@ namespace ReturnToSender.ViewModels
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Loop through all <see cref="HttpServer"/> in <seealso cref="ObservableCollection{T}"/> and subscribe to ServerErrorEvent
+        /// </summary>
         private void SubscribeToEvents()
         {
             foreach (HttpServer server in HttpServer)
@@ -127,12 +130,18 @@ namespace ReturnToSender.ViewModels
                 server.ServerErrorEvent += ServerErrorEvent;
             }
         }
-
+        /// <summary>
+        /// Add <see cref="HttpServer"/> error message to <seealso cref="MainWindowViewModel.ErrorMessage"/>
+        /// </summary>
+        /// <param name="sender"><see cref="HttpServer"/></param>
+        /// <param name="e"><see cref="ServerErrorEventArgs"/></param>
         private void ServerErrorEvent(object sender, ServerErrorEventArgs e)
         {
             ErrorMessage = e.ErrorMessage;
         }
-
+        /// <summary>
+        /// Set all <see cref="MainWindowViewModel"/> <seealso cref="ICommand"/>s
+        /// </summary>
         private void SetCommands()
         {
             // Caption Buttons
@@ -152,9 +161,8 @@ namespace ReturnToSender.ViewModels
             VerifyJsonCommand = new RelayCommand(() => VerifyJsonCommandAction());
             StartServerCommand = new RelayParamterCommand(async (param) => await StartServerCommandAction(param));
         }
-
         /// <summary>
-        /// Refreshes the item list after changes made
+        /// Refreshes the <see cref="MainWindow"/> <seealso cref="TabControl"/> <seealso cref="TabItem"/>s after changes made
         /// </summary>
         private void Refresh()
         {
@@ -165,7 +173,11 @@ namespace ReturnToSender.ViewModels
                 tabs.Items.Refresh();
             }
         }
-
+        /// <summary>
+        /// Verifies the <see cref="HttpServer.Response"/> matches the <seealso cref="HttpServer.ContentType"/>
+        /// </summary>
+        /// <param name="server"><see cref="HttpServer"/></param>
+        /// <param name="contentType"><see cref="HttpServer.ContentType"/></param>
         private void VerifyContent(HttpServer server, string contentType)
         {
             switch (contentType)
@@ -259,8 +271,13 @@ namespace ReturnToSender.ViewModels
             }
             Refresh();
         }
-
-        private string ObjectToJsonString(object obj)
+        /// <summary>
+        /// Serializes the <see cref="Object"/> into a JSON string and returns it
+        /// </summary>
+        /// <param name="obj">Object to turn in JSON string</param>
+        /// <param name="subscribe">If true will resubscribe to object events</param>
+        /// <returns></returns>
+        private string ObjectToJsonString(object obj, bool subscribe)
         {
             foreach (HttpServer server in HttpServer)
             {
@@ -270,10 +287,12 @@ namespace ReturnToSender.ViewModels
             var jsonObject = JsonConvert.SerializeObject(obj);
             JToken jo = JToken.Parse(jsonObject);
             jsonObject = jo.ToString(Newtonsoft.Json.Formatting.Indented);
-            SubscribeToEvents();
+            if (subscribe) { SubscribeToEvents(); }
             return jsonObject;
         }
-
+        /// <summary>
+        /// Gets the application user settings and updates the application with them
+        /// </summary>
         private void GetUserSettings()
         {
             var jsonObject = (string)Properties.Settings.Default["Servers"];
@@ -320,7 +339,7 @@ namespace ReturnToSender.ViewModels
                 server.Stop = true;
             }
             Refresh();
-            var jsonObject = ObjectToJsonString(HttpServer);
+            var jsonObject = ObjectToJsonString(HttpServer, false);
             Properties.Settings.Default["Servers"] = jsonObject;
             Properties.Settings.Default["Theme"] = CurrentTheme;
             Properties.Settings.Default.Save();
@@ -373,7 +392,7 @@ namespace ReturnToSender.ViewModels
         {
             IsBusy = true;
             // Create json string from HttpServer and format
-            var jsonObject = ObjectToJsonString(HttpServer);
+            var jsonObject = ObjectToJsonString(HttpServer, true);
             if (jsonObject.Length > 0)
             {
                 // Open windows save dialog
@@ -404,6 +423,7 @@ namespace ReturnToSender.ViewModels
                         await fileStream.FlushAsync();
                         fileStream.Close();
                     }
+                    ErrorMessage = $"Current configuration saved as {Path.GetFileName(fullPath)}";
                 }
             }
             IsBusy = false;
@@ -416,33 +436,32 @@ namespace ReturnToSender.ViewModels
         {
             // Get string
             var str = (string)param;
-            if (str != null)
+            // Get the current HttpServer
+            var http = HttpServer[SelectedTab];
+            if (http.Started)
             {
-                // Remove first matching HttpServer from list and update UI
-                var http = HttpServer.FirstOrDefault(x => x.Request == str);
-                if (http.Started)
-                {
-                    http.Stop = true;
-                    http.Started = false;
-                }
-                else
-                {
-                    http.Started = true;
-                    http.Stop = false;
-                    Refresh();
-                    try
-                    {
-                        await http.Start();
-                    }
-                    catch (Exception e)
-                    {
-                        http.Stop = false;
-                        Debug.WriteLine(e.Message);
-                        // User has stoped http server and restarted without sending request
-                    }
-                }
-                Refresh();
+                http.Stop = true;
+                http.Started = false;
+                ErrorMessage = "Server stopped";
             }
+            else
+            {
+                http.Started = true;
+                http.Stop = false;
+                Refresh();
+                ErrorMessage = str != null ? $"Server listening for {str}" : "Server started";
+                try
+                {
+                    await http.Start();
+                }
+                catch (Exception e)
+                {
+                    http.Stop = false;
+                    Debug.WriteLine(e.Message);
+                    // User has stoped http server and restarted without sending request
+                }
+            }
+            Refresh();
         }
 
         /// <summary>

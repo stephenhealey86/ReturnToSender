@@ -89,7 +89,8 @@
                                 Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.SaveFileCommand}"
                                 Foreground="{TemplateBinding Foreground}"
                                 IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.IsBusy, Converter={convertors:InvertBoolValueConvertor}}"
-                                Style="{DynamicResource ResourceKey=TabButton}">
+                                Style="{DynamicResource ResourceKey=TabButton}"
+                                ToolTip="Save Config">
                                 <materialDesign:PackIcon Kind="ContentSave" />
                             </Button>
 
@@ -103,7 +104,8 @@
                                 Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.OpenFileCommand}"
                                 Foreground="{TemplateBinding Foreground}"
                                 IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.IsBusy, Converter={convertors:InvertBoolValueConvertor}}"
-                                Style="{DynamicResource ResourceKey=TabButton}">
+                                Style="{DynamicResource ResourceKey=TabButton}"
+                                ToolTip="Open Config">
                                 <materialDesign:PackIcon Kind="FolderOpen" />
                             </Button>
 
@@ -117,7 +119,8 @@
                                 Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.ThemeCommand}"
                                 Foreground="{TemplateBinding Foreground}"
                                 IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.IsBusy, Converter={convertors:InvertBoolValueConvertor}}"
-                                Style="{DynamicResource ResourceKey=TabButton}">
+                                Style="{DynamicResource ResourceKey=TabButton}"
+                                ToolTip="Change Theme">
                                 <materialDesign:PackIcon Kind="Settings" />
                             </Button>
                         </StackPanel>

@@ -88,7 +88,6 @@ namespace ReturnToSender.Models
             {
                 // Start the Http Listener
                 httpListener.Start();
-                OnServerErrorEvent(new ServerErrorEventArgs("Server Started"));
                 Started = true;
                 while (!Stop)
                 {
