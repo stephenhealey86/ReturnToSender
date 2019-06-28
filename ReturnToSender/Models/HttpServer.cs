@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReturnToSender.Events;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -57,6 +58,10 @@ namespace ReturnToSender.Models
         /// The Http response content type
         /// </summary>
         public string ContentType { get; set; } = "JSON - application/json";
+        /// <summary>
+        /// Event for the VM to subscribe to for passing error messages to the VM error handler
+        /// </summary>
+        public EventHandler<ServerErrorEventArgs> ServerErrorEvent;
         #endregion
 
         #region Constructors
@@ -83,6 +88,7 @@ namespace ReturnToSender.Models
             {
                 // Start the Http Listener
                 httpListener.Start();
+                OnServerErrorEvent(new ServerErrorEventArgs("Server Started"));
                 Started = true;
                 while (!Stop)
                 {
@@ -137,7 +143,10 @@ namespace ReturnToSender.Models
         #endregion
 
         #region Helper Methods
-
+        protected virtual void OnServerErrorEvent(ServerErrorEventArgs e)
+        {
+            ServerErrorEvent?.Invoke(this, e);
+        }
         #endregion
     }
 }

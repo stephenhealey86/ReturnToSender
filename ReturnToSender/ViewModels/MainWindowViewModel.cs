@@ -1,7 +1,9 @@
 ﻿using HtmlAgilityPack;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReturnToSender.Events;
 using ReturnToSender.Models;
 using System;
 using System.Collections.Generic;
@@ -24,11 +26,22 @@ namespace ReturnToSender.ViewModels
         #region Private Variables
         Window _window;
         private int CurrentTheme;
+        private string errorMessage;
+        private Snackbar DisplayError;
         #endregion
 
         #region Public Variables
         public ObservableCollection<HttpServer> HttpServer { get; set; }
         public int SelectedTab { get; set; } = 0;
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
+            set
+            {
+                errorMessage = value;
+                DisplayError.MessageQueue.Enqueue(ErrorMessage, "Ok", () => { errorMessage = null; });
+            }
+        }
         #endregion
 
         #region Commands
@@ -101,10 +114,25 @@ namespace ReturnToSender.ViewModels
             SetCommands();
             HttpServer = new ObservableCollection<HttpServer>();
             GetUserSettings();
+            SubscribeToEvents();
+            DisplayError = _window.FindName("MyMessageQueue") as Snackbar;
         }
         #endregion
 
         #region Helper Methods
+        private void SubscribeToEvents()
+        {
+            foreach (HttpServer server in HttpServer)
+            {
+                server.ServerErrorEvent += ServerErrorEvent;
+            }
+        }
+
+        private void ServerErrorEvent(object sender, ServerErrorEventArgs e)
+        {
+            ErrorMessage = e.ErrorMessage;
+        }
+
         private void SetCommands()
         {
             // Caption Buttons
@@ -234,9 +262,15 @@ namespace ReturnToSender.ViewModels
 
         private string ObjectToJsonString(object obj)
         {
+            foreach (HttpServer server in HttpServer)
+            {
+                // Remove event handler before serialization
+                server.ServerErrorEvent = null;
+            }
             var jsonObject = JsonConvert.SerializeObject(obj);
             JToken jo = JToken.Parse(jsonObject);
             jsonObject = jo.ToString(Newtonsoft.Json.Formatting.Indented);
+            SubscribeToEvents();
             return jsonObject;
         }
 
@@ -282,6 +316,7 @@ namespace ReturnToSender.ViewModels
         {
             foreach (HttpServer server in HttpServer)
             {
+                // Stop th servers
                 server.Stop = true;
             }
             Refresh();
@@ -320,11 +355,12 @@ namespace ReturnToSender.ViewModels
                         var jsonObject = Encoding.ASCII.GetString(buffer);
                         HttpServer = JsonConvert.DeserializeObject<ObservableCollection<HttpServer>>(jsonObject);
                         Refresh();
+                        ErrorMessage = $"Opened {Path.GetFileName(fullPath)}";
                     }
                 }
                 catch (Exception)
                 {
-                    
+                    ErrorMessage = "File not compatable";
                 }
             }
             IsBusy = false;
@@ -428,6 +464,7 @@ namespace ReturnToSender.ViewModels
             {
                 HttpServer.Add(new HttpServer());
                 SelectedTab = HttpServer.Count - 1;
+                HttpServer[SelectedTab].ServerErrorEvent += ServerErrorEvent;
                 OnPropertyChanged(nameof(SelectedTab));
                 Refresh();
             }

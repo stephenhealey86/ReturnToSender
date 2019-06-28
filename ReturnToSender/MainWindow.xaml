@@ -171,6 +171,8 @@
                 Foreground="{Binding Theme.ForeGround}"
                 ItemsSource="{Binding HttpServer, Mode=OneWay}"
                 SelectedIndex="{Binding SelectedTab}" />
+
+            <materialDesign:Snackbar Name="MyMessageQueue" MessageQueue="{materialDesign:MessageQueue}" />
         </Grid>
     </Grid>
 </Window>
