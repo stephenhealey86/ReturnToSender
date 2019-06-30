@@ -156,7 +156,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -164,7 +163,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-
+                            <!--#region Row 0-->
                             <!--  Select type of Http request  -->
                             <ComboBox
                                 Grid.Row="0"
@@ -173,8 +172,9 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Bottom"
                                 IsHitTestVisible="{Binding Started, Converter={convertors:InvertBoolValueConvertor}}"
+                                SelectedIndex="{Binding HttpMethod, Converter={convertors:HttpMethodToIntValueConvertor}}"
                                 Text="{Binding HttpMethod}">
-                                <ComboBoxItem Content="GET" IsSelected="True" />
+                                <ComboBoxItem Content="GET" />
                                 <ComboBoxItem Content="POST" />
                                 <ComboBoxItem Content="PUT" />
                                 <ComboBoxItem Content="PATCH" />
@@ -210,61 +210,112 @@
                                 Content="{Binding ButtonStatus, Mode=OneWay}"
                                 Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background}"
                                 Style="{DynamicResource MaterialDesignRaisedButton}" />
-
-                            <!--  Heading  -->
-                            <StackPanel
+                            <!--#endregion-->
+                            <!--#region Row 1-->
+                            <ScrollViewer
                                 Grid.Row="1"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="3"
-                                Margin="10,5,10,0"
-                                Orientation="Horizontal">
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Style="{DynamicResource MaterialDesignSubheadingTextBlock}"
-                                    Text="Http Server Response" />
-                                <!--  Select type of Http request  -->
-                                <ComboBox
-                                    Name="MyContentType"
-                                    Margin="10,0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    IsHitTestVisible="{Binding Started, Converter={convertors:InvertBoolValueConvertor}}"
-                                    Text="{Binding ContentType}">
-                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JSON}, Converter={convertors:KeyValuePairValueConvertor}}" IsSelected="True" />
-                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.Text}, Converter={convertors:KeyValuePairValueConvertor}}" />
-                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JavaScript}, Converter={convertors:KeyValuePairValueConvertor}}" />
-                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.XML}, Converter={convertors:KeyValuePairValueConvertor}}" />
-                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.HTML}, Converter={convertors:KeyValuePairValueConvertor}}" />
-                                </ComboBox>
-                                <Button
-                                    Margin="10,0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Bottom"
-                                    VerticalContentAlignment="Center"
-                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.VerifyJsonCommand}"
-                                    Content="Verify"
-                                    Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
-                                    Style="{DynamicResource MaterialDesignFloatingActionMiniAccentButton}" />
-                            </StackPanel>
-
-                            <!--  Enter Http Server Response  -->
-                            <TextBox
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="3"
-                                Margin="10"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                materialDesign:HintAssist.Hint="{Binding VerificationString}"
-                                materialDesign:TextFieldAssist.TextFieldCornerRadius="20"
-                                AcceptsReturn="True"
-                                AcceptsTab="True"
-                                Foreground="Red"
-                                IsReadOnly="{Binding Started}"
-                                Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}"
-                                Text="{Binding Response, Mode=TwoWay}"
-                                TextWrapping="Wrap" />
+                                VerticalScrollBarVisibility="Hidden">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <!--  Http Server Response  -->
+                                    <Expander
+                                        Grid.Row="0"
+                                        Background="Transparent"
+                                        ExpandDirection="Down"
+                                        IsExpanded="True">
+                                        <Expander.Header>
+                                            <!--  Heading  -->
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Style="{DynamicResource MaterialDesignSubheadingTextBlock}"
+                                                    Text="Http Server Response" />
+                                                <!--  Select type of Http request  -->
+                                                <ComboBox
+                                                    Name="MyContentType"
+                                                    Margin="10,0"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    IsHitTestVisible="{Binding Started, Converter={convertors:InvertBoolValueConvertor}}"
+                                                    Text="{Binding ContentType}">
+                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JSON}, Converter={convertors:KeyValuePairValueConvertor}}" IsSelected="True" />
+                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.Text}, Converter={convertors:KeyValuePairValueConvertor}}" />
+                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JavaScript}, Converter={convertors:KeyValuePairValueConvertor}}" />
+                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.XML}, Converter={convertors:KeyValuePairValueConvertor}}" />
+                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.HTML}, Converter={convertors:KeyValuePairValueConvertor}}" />
+                                                </ComboBox>
+                                                <Button
+                                                    Margin="10,0"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Bottom"
+                                                    VerticalContentAlignment="Center"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.VerifyJsonCommand}"
+                                                    Content="Verify"
+                                                    Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
+                                                    Style="{DynamicResource MaterialDesignFloatingActionMiniAccentButton}" />
+                                            </StackPanel>
+                                        </Expander.Header>
+                                        <!--  Enter Http Server Response  -->
+                                        <TextBox
+                                            Margin="10"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            materialDesign:HintAssist.Hint="{Binding VerificationString}"
+                                            materialDesign:TextFieldAssist.TextFieldCornerRadius="20"
+                                            AcceptsReturn="True"
+                                            AcceptsTab="True"
+                                            Foreground="Red"
+                                            IsReadOnly="{Binding Started}"
+                                            MinLines="10"
+                                            Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}"
+                                            Text="{Binding Response, Mode=TwoWay}"
+                                            TextWrapping="Wrap" />
+                                    </Expander>
+                                    <!--  Divider  -->
+                                    <Border
+                                        Grid.Row="1"
+                                        Width="1"
+                                        HorizontalAlignment="Stretch"
+                                        Background="{DynamicResource MaterialDesignDivider}"
+                                        SnapsToDevicePixels="True" />
+                                    <!--  Http Client Request  -->
+                                    <Expander
+                                        Grid.Row="2"
+                                        Background="Transparent"
+                                        ExpandDirection="Down">
+                                        <Expander.Header>
+                                            <!--  Heading  -->
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Style="{DynamicResource MaterialDesignSubheadingTextBlock}"
+                                                    Text="Http Client Request" />
+                                            </StackPanel>
+                                        </Expander.Header>
+                                        <!--  Enter Http Server Response  -->
+                                        <TextBox
+                                            Margin="10"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            materialDesign:TextFieldAssist.TextFieldCornerRadius="20"
+                                            AcceptsReturn="True"
+                                            AcceptsTab="True"
+                                            IsReadOnly="True"
+                                            Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}"
+                                            Text="{Binding ClientRequest, Converter={convertors:ClientRequestToStringValueConvertor}}"
+                                            TextWrapping="Wrap" />
+                                    </Expander>
+                                </Grid>
+                            </ScrollViewer>
+                            <!--#endregion-->
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -289,6 +340,7 @@
                                     SnapsToDevicePixels="True" />
                                 <Grid>
                                     <Label
+                                        Name="Label"
                                         Margin="-10,0,0,0"
                                         Content="{Binding Request, Converter={convertors:TrimStringValueConvertor}}"
                                         Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}" />
@@ -320,6 +372,7 @@
                             </MultiTrigger.Conditions>
                             <MultiTrigger.Setters>
                                 <Setter TargetName="Border" Property="Fill" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Background, Converter={convertors:ColorConvertor}, ConverterParameter=0.9}" />
+                                <Setter TargetName="Label" Property="ToolTip" Value="{Binding Request}" />
                             </MultiTrigger.Setters>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>

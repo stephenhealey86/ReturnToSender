@@ -11,7 +11,7 @@
     xmlns:models="clr-namespace:ReturnToSender.Models"
     Title="{Binding Title}"
     Width="800"
-    Height="450"
+    Height="600"
     AllowsTransparency="True"
     TextElement.FontSize="13"
     TextElement.FontWeight="Regular"

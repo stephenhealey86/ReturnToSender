@@ -62,12 +62,19 @@ namespace ReturnToSender.Models
         /// Event for the VM to subscribe to for passing error messages to the VM error handler
         /// </summary>
         public EventHandler<ServerErrorEventArgs> ServerErrorEvent;
+
+        public EventHandler<EventArgs> ServerEvent;
+        /// <summary>
+        /// The content of the clients request
+        /// </summary>
+        public ClientRequestInfo ClientRequest { get; set; }
         #endregion
 
         #region Constructors
         public HttpServer()
         {
             httpListener = new HttpListener();
+            ClientRequest = new ClientRequestInfo();
         }
         #endregion
 
@@ -100,7 +107,6 @@ namespace ReturnToSender.Models
                             break;
                         }
                         request = context.Request;
-                        var body = new StreamReader(context.Request.InputStream).ReadToEnd();
                         // Obtain a response object.
                         response = context.Response;
                         response.ContentType = ContentType;
@@ -113,11 +119,14 @@ namespace ReturnToSender.Models
                         else if (request.HttpMethod == HttpMethod)
                         {
                             buffer = Encoding.UTF8.GetBytes(Response);
+                            UpdateClientRequest(request);
                         }
                         else
                         {
                             response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
-                            buffer = Encoding.UTF8.GetBytes($"Wrong Http Method, {HttpMethod} does not match {request.HttpMethod}");
+                            var message = $"Wrong Http Method, {HttpMethod} does not match {request.HttpMethod}";
+                            buffer = Encoding.UTF8.GetBytes(message);
+                            OnServerErrorEvent(new ServerErrorEventArgs(message));
                         }
                         // Get a response stream and write the response to it.
                         response.ContentLength64 = buffer.Length;
@@ -128,6 +137,7 @@ namespace ReturnToSender.Models
                     }
                     catch (Exception e)
                     {
+                        OnServerErrorEvent(new ServerErrorEventArgs($"Internal Error: {e.Message}"));
                         Started = false;
                         Stop = true;
                     }
@@ -142,9 +152,37 @@ namespace ReturnToSender.Models
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Raises an event that passes the error message to the viewmodel
+        /// </summary>
+        /// <param name="e"></param>
         protected virtual void OnServerErrorEvent(ServerErrorEventArgs e)
         {
             ServerErrorEvent?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Raise event in http server so viewmodel can sunscribe
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnServerEvent(EventArgs e)
+        {
+            ServerEvent?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Updates the public var ClientRequest
+        /// </summary>
+        /// <param name="request"><see cref="HttpListenerRequest"/></param>
+        private void UpdateClientRequest(HttpListenerRequest request)
+        {
+            ClientRequest = new ClientRequestInfo();
+            ClientRequest.ClientIpAddress = request.RemoteEndPoint.Address.ToString();
+            ClientRequest.ClientPort = request.RemoteEndPoint.Port.ToString();
+            ClientRequest.HttpMethod = request.HttpMethod;
+            ClientRequest.ContentType = request.ContentType;
+            ClientRequest.Headers = request.Headers.ToString().Trim();
+            ClientRequest.Body = new StreamReader(request.InputStream).ReadToEnd();
+
+            OnServerEvent(new EventArgs());
         }
         #endregion
     }

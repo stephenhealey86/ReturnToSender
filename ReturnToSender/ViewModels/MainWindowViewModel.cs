@@ -128,6 +128,7 @@ namespace ReturnToSender.ViewModels
             foreach (HttpServer server in HttpServer)
             {
                 server.ServerErrorEvent += ServerErrorEvent;
+                server.ServerEvent += delegate { Refresh(); };
             }
         }
         /// <summary>
@@ -283,6 +284,8 @@ namespace ReturnToSender.ViewModels
             {
                 // Remove event handler before serialization
                 server.ServerErrorEvent = null;
+                server.ServerEvent = null;
+                server.ClientRequest = null;
             }
             var jsonObject = JsonConvert.SerializeObject(obj);
             JToken jo = JToken.Parse(jsonObject);
@@ -316,13 +319,15 @@ namespace ReturnToSender.ViewModels
                     NewServerCommandAction();
                 }
             }
+            // Get theme
             var theme = (int)Properties.Settings.Default["Theme"];
-            if (true)
-            {
-                CurrentTheme = theme;
-                Theme = ThemeTypes.GetTheme(CurrentTheme);
-                OnPropertyChanged(nameof(Theme));
-            }
+            CurrentTheme = theme;
+            Theme = ThemeTypes.GetTheme(CurrentTheme);
+            OnPropertyChanged(nameof(Theme));
+
+            // Get selected tab
+            SelectedTab = (int)Properties.Settings.Default["SelectedTab"];
+
             Refresh();
         }
         #endregion
@@ -342,6 +347,7 @@ namespace ReturnToSender.ViewModels
             var jsonObject = ObjectToJsonString(HttpServer, false);
             Properties.Settings.Default["Servers"] = jsonObject;
             Properties.Settings.Default["Theme"] = CurrentTheme;
+            Properties.Settings.Default["SelectedTab"] = SelectedTab;
             Properties.Settings.Default.Save();
             _window.Close();
         }
