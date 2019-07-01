@@ -189,7 +189,7 @@
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Bottom"
                                 HorizontalContentAlignment="Left"
-                                materialDesign:HintAssist.Hint="Http Server Uri"
+                                materialDesign:HintAssist.Hint="Http Server Uri - http://192.168.1.2/api"
                                 Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
                                 IsReadOnly="{Binding Started}"
                                 Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
@@ -244,8 +244,8 @@
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
                                                     IsHitTestVisible="{Binding Started, Converter={convertors:InvertBoolValueConvertor}}"
-                                                    Text="{Binding ContentType}">
-                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JSON}, Converter={convertors:KeyValuePairValueConvertor}}" IsSelected="True" />
+                                                    SelectedIndex="{Binding ContentType}">
+                                                    <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JSON}, Converter={convertors:KeyValuePairValueConvertor}}" />
                                                     <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.Text}, Converter={convertors:KeyValuePairValueConvertor}}" />
                                                     <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.JavaScript}, Converter={convertors:KeyValuePairValueConvertor}}" />
                                                     <ComboBoxItem Content="{Binding Source={x:Static models:HttpContentType.XML}, Converter={convertors:KeyValuePairValueConvertor}}" />

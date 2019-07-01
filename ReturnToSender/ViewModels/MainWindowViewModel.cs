@@ -338,12 +338,26 @@ namespace ReturnToSender.ViewModels
         /// </summary>
         private void CloseCommandAction()
         {
+            // Servers to remove before saving
+            var list = new List<HttpServer>();
+            // Loop through servers and stop and store unused for removing
             foreach (HttpServer server in HttpServer)
             {
-                // Stop th servers
+                // Stop the servers
                 server.Stop = true;
+                // Add to removal list
+                if (server.Request == null)
+                {
+                    list.Add(server);
+                }
+            }
+            // Remove blank servers
+            foreach (HttpServer item in list)
+            {
+                HttpServer.Remove(item);
             }
             Refresh();
+            // Store user settings
             var jsonObject = ObjectToJsonString(HttpServer, false);
             Properties.Settings.Default["Servers"] = jsonObject;
             Properties.Settings.Default["Theme"] = CurrentTheme;
@@ -476,7 +490,7 @@ namespace ReturnToSender.ViewModels
         private void VerifyJsonCommandAction()
         {
             var http = HttpServer[SelectedTab];
-            var contentType = http.ContentType.Split('-')[0].Trim();
+            var contentType = HttpContentType.GetContentType(http.ContentType).Key;
             VerifyContent(http, contentType);
         }
 

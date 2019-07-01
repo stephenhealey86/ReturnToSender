@@ -21,7 +21,11 @@ namespace ReturnToSender.ValueConvertors
 
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            var str = (string)value;
+            var strArray = str.Split('-');
+            var strKey = strArray[0].Trim();
+            var strValue = strArray[1].Trim();
+            return new KeyValuePair<string, string>(strKey, strValue);
         }
     }
 }

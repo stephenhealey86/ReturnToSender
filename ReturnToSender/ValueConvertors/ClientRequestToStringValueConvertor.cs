@@ -16,8 +16,11 @@ namespace ReturnToSender.ValueConvertors
             var stringToReturn = new StringBuilder();
             if (clientRequest != null)
             {
+                stringToReturn.AppendLine(clientRequest.Date);
+                stringToReturn.AppendLine(clientRequest.Time);
                 stringToReturn.AppendLine(clientRequest.ClientIpAddress);
                 stringToReturn.AppendLine(clientRequest.ClientPort);
+                stringToReturn.AppendLine(clientRequest.KeepAlive);
                 stringToReturn.AppendLine(clientRequest.Headers);
                 stringToReturn.AppendLine(clientRequest.HttpMethod);
                 stringToReturn.AppendLine(clientRequest.ContentType);

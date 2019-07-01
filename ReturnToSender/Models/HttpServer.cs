@@ -57,7 +57,7 @@ namespace ReturnToSender.Models
         /// <summary>
         /// The Http response content type
         /// </summary>
-        public string ContentType { get; set; } = "JSON - application/json";
+        public int ContentType { get; set; } = 0;
         /// <summary>
         /// Event for the VM to subscribe to for passing error messages to the VM error handler
         /// </summary>
@@ -109,7 +109,7 @@ namespace ReturnToSender.Models
                         request = context.Request;
                         // Obtain a response object.
                         response = context.Response;
-                        response.ContentType = ContentType;
+                        response.ContentType = HttpContentType.GetContentType(ContentType).Value;
                         var uriPath = request.Url.AbsolutePath.ToLower().Trim('/');
                         if (!Request.ToLower().Trim('/').EndsWith(uriPath))
                         {
@@ -175,8 +175,11 @@ namespace ReturnToSender.Models
         private void UpdateClientRequest(HttpListenerRequest request)
         {
             ClientRequest = new ClientRequestInfo();
+            ClientRequest.Date = DateTime.Now.Date.ToString("dd:MM:yyyy");
+            ClientRequest.Time = DateTime.Now.ToUniversalTime().ToString("HH:mm:ss");
             ClientRequest.ClientIpAddress = request.RemoteEndPoint.Address.ToString();
             ClientRequest.ClientPort = request.RemoteEndPoint.Port.ToString();
+            ClientRequest.KeepAlive = request.KeepAlive.ToString();
             ClientRequest.HttpMethod = request.HttpMethod;
             ClientRequest.ContentType = request.ContentType;
             ClientRequest.Headers = request.Headers.ToString().Trim();
