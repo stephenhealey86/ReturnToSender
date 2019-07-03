@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,10 +29,21 @@ namespace ReturnToSender.ViewModels
         private int CurrentTheme;
         private string errorMessage;
         private Snackbar DisplayError;
+        private string Version
+        {
+            get
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var Major = assembly.GetName().Version.Major;
+                var Minor = assembly.GetName().Version.Minor;
+                var Revision = assembly.GetName().Version.Revision;
+                return $"V{Major}.{Minor}.{Revision}";
+            }
+        }
         #endregion
 
         #region Public Variables
-        public ObservableCollection<HttpServer> HttpServer { get; set; }
+        public ObservableCollection<HttpServer> HttpServer { get; set; } = new ObservableCollection<HttpServer>();
         public int SelectedTab { get; set; } = 0;
         public string ErrorMessage
         {
@@ -110,9 +122,8 @@ namespace ReturnToSender.ViewModels
         public MainWindowViewModel(Window window)
         {
             _window = window;
-            Title = "ReturnToSender";
+            Title = $"ReturnToSender - {Version}";
             SetCommands();
-            HttpServer = new ObservableCollection<HttpServer>();
             GetUserSettings();
             SubscribeToEvents();
             DisplayError = _window.FindName("MyMessageQueue") as Snackbar;
@@ -168,8 +179,7 @@ namespace ReturnToSender.ViewModels
         private void Refresh()
         {
             OnPropertyChanged(nameof(HttpServer));
-            var tabs = _window.FindName("MyTabControl") as TabControl;
-            if (tabs != null)
+            if (_window.FindName("MyTabControl") is TabControl tabs)
             {
                 tabs.Items.Refresh();
             }
@@ -303,7 +313,7 @@ namespace ReturnToSender.ViewModels
             {
                 try
                 {
-                    HttpServer = JsonConvert.DeserializeObject<ObservableCollection<HttpServer>>(jsonObject);
+                    HttpServer = JsonConvert.DeserializeObject<ObservableCollection<HttpServer>>(jsonObject) ?? HttpServer;
                     foreach (HttpServer server in HttpServer)
                     {
                         server.Started = false;
@@ -319,6 +329,10 @@ namespace ReturnToSender.ViewModels
                     NewServerCommandAction();
                 }
             }
+            else
+            {
+                NewServerCommandAction();
+            }
             // Get theme
             var theme = (int)Properties.Settings.Default["Theme"];
             CurrentTheme = theme;
@@ -326,7 +340,7 @@ namespace ReturnToSender.ViewModels
             OnPropertyChanged(nameof(Theme));
 
             // Get selected tab
-            SelectedTab = (int)Properties.Settings.Default["SelectedTab"];
+            SelectedTab = (int)Properties.Settings.Default["SelectedTab"] >= 0 ? (int)Properties.Settings.Default["SelectedTab"] : 0;
 
             Refresh();
         }
@@ -346,7 +360,7 @@ namespace ReturnToSender.ViewModels
                 // Stop the servers
                 server.Stop = true;
                 // Add to removal list
-                if (server.Request == null)
+                if (server.Request == null || server.Request?.Length == 0)
                 {
                     list.Add(server);
                 }
@@ -499,14 +513,17 @@ namespace ReturnToSender.ViewModels
         /// </summary>
         private void NewServerCommandAction()
         {
-            if (HttpServer.Count <= 9)
+            if (HttpServer?.Count > 9)
             {
-                HttpServer.Add(new HttpServer());
-                SelectedTab = HttpServer.Count - 1;
-                HttpServer[SelectedTab].ServerErrorEvent += ServerErrorEvent;
-                OnPropertyChanged(nameof(SelectedTab));
-                Refresh();
+                return;
             }
+
+            HttpServer.Add(new HttpServer());
+            SelectedTab = HttpServer.Count - 1;
+            HttpServer[SelectedTab].ServerErrorEvent += ServerErrorEvent;
+            HttpServer[SelectedTab].ServerEvent += delegate { Refresh(); };
+            OnPropertyChanged(nameof(SelectedTab));
+            Refresh();
         }
 
         /// <summary>

@@ -10,15 +10,15 @@ namespace ReturnToSender.Models
     public class ClientRequestInfo
     {
         #region Private Variables
-        private string date;
-        private string time;
-        private string clientIpAddress;
-        private string clientPort;
-        private string keepAlive;
-        private string httpMethod;
-        private string contentType;
-        private string headers;
-        private string body;
+        private string date = "";
+        private string time = "";
+        private string clientIpAddress = "";
+        private string clientPort = "";
+        private string keepAlive = "";
+        private string httpMethod = "";
+        private string contentType = "";
+        private string headers = "";
+        private string body = "";
         #endregion
         #region Public Variables
         public string Date
@@ -63,7 +63,7 @@ namespace ReturnToSender.Models
         }
         public string Body
         {
-            get { body = body.Length > 0 ? "\n\t" + body : "\tN/A"; return $"Body:{body}"; }
+            get { body = body?.Length > 0 ? "\n\t" + body : "\tN/A"; return $"Body:{body}"; }
             set { body = value.Replace("\n", "\n\t"); }
         }
         #endregion

@@ -14,7 +14,7 @@ namespace ReturnToSender.Events
         /// <summary>
         /// Error message to pass to the viewmodel
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = "";
         /// <summary>
         /// Constructor, takes error message as string
         /// </summary>

@@ -37,11 +37,11 @@ namespace ReturnToSender.Models
         /// <summary>
         /// The response from the http server
         /// </summary>
-        public string Response { get; set; }
+        public string Response { get; set; } = "";
         /// <summary>
         /// The request Uri as a string for the http server
         /// </summary>
-        public string Request { get; set; }
+        public string Request { get; set; } = "";
         /// <summary>
         /// Indicator string for the start/stop button
         /// </summary>
@@ -49,7 +49,7 @@ namespace ReturnToSender.Models
         /// <summary>
         /// Indicator string for the verification button
         /// </summary>
-        public string VerificationString { get; set; }
+        public string VerificationString { get; set; } = "";
         /// <summary>
         /// Http method choosen by user
         /// </summary>
@@ -174,16 +174,18 @@ namespace ReturnToSender.Models
         /// <param name="request"><see cref="HttpListenerRequest"/></param>
         private void UpdateClientRequest(HttpListenerRequest request)
         {
-            ClientRequest = new ClientRequestInfo();
-            ClientRequest.Date = DateTime.Now.Date.ToString("dd:MM:yyyy");
-            ClientRequest.Time = DateTime.Now.ToUniversalTime().ToString("HH:mm:ss");
-            ClientRequest.ClientIpAddress = request.RemoteEndPoint.Address.ToString();
-            ClientRequest.ClientPort = request.RemoteEndPoint.Port.ToString();
-            ClientRequest.KeepAlive = request.KeepAlive.ToString();
-            ClientRequest.HttpMethod = request.HttpMethod;
-            ClientRequest.ContentType = request.ContentType;
-            ClientRequest.Headers = request.Headers.ToString().Trim();
-            ClientRequest.Body = new StreamReader(request.InputStream).ReadToEnd();
+            ClientRequest = new ClientRequestInfo
+            {
+                Date = DateTime.Now.Date.ToString("dd:MM:yyyy"),
+                Time = DateTime.Now.ToUniversalTime().ToString("HH:mm:ss"),
+                ClientIpAddress = request.RemoteEndPoint.Address.ToString(),
+                ClientPort = request.RemoteEndPoint.Port.ToString(),
+                KeepAlive = request.KeepAlive.ToString(),
+                HttpMethod = request.HttpMethod,
+                ContentType = request.ContentType,
+                Headers = request.Headers.ToString().Trim(),
+                Body = new StreamReader(request.InputStream).ReadToEnd()
+            };
 
             OnServerEvent(new EventArgs());
         }

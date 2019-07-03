@@ -1,0 +1,378 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FontAwesome5.WPF</name>
+    </assembly>
+    <members>
+        <member name="T:FontAwesome5.WPF.Awesome">
+            <summary>
+            Provides attached properties to set FontAwesome icons on controls.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Awesome.ContentProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.Awesome.Content attached dependency property.
+            </summary>
+        </member>
+        <member name="M:FontAwesome5.WPF.Awesome.GetContent(System.Windows.DependencyObject)">
+            <summary>
+            Gets the content of a ContentControl, expressed as a FontAwesome icon.
+            </summary>
+            <param name="target">The ContentControl subject of the query</param>
+            <returns>FontAwesome icon found as content</returns>
+        </member>
+        <member name="M:FontAwesome5.WPF.Awesome.SetContent(System.Windows.DependencyObject,FontAwesome5.EFontAwesomeIcon)">
+            <summary>
+            Sets the content of a ContentControl expressed as a FontAwesome icon. This will cause the content to be redrawn.
+            </summary>
+            <param name="target">The ContentControl where to set the content</param>
+            <param name="value">FontAwesome icon to set as content</param>
+        </member>
+        <member name="T:FontAwesome5.WPF.Converters.ImageSourceConverter">
+            <summary>
+            Converts a FontAwesomIcon to an ImageSource. Use the ConverterParameter to pass the Brush.
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.Extensions.ControlExtensions">
+            <summary>
+            Control extensions
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Extensions.ControlExtensions.SpinnerStoryBoardName">
+            <summary>
+            The key used for storing the spinner Storyboard.
+            </summary>
+        </member>
+        <member name="M:FontAwesome5.WPF.Extensions.ControlExtensions.BeginSpin``1(``0)">
+            <summary>
+            Start the spinning animation
+            </summary>
+            <typeparam name="T">FrameworkElement and ISpinable</typeparam>
+            <param name="control">Control to apply the rotation </param>
+        </member>
+        <member name="M:FontAwesome5.WPF.Extensions.ControlExtensions.StopSpin``1(``0)">
+            <summary>
+            Stop the spinning animation 
+            </summary>
+            <typeparam name="T">FrameworkElement and ISpinable</typeparam>
+            <param name="control">Control to stop the rotation.</param>
+        </member>
+        <member name="M:FontAwesome5.WPF.Extensions.ControlExtensions.SetRotation``1(``0)">
+            <summary>
+            Sets the rotation for the control
+            </summary>
+            <typeparam name="T">FrameworkElement and IRotatable</typeparam>
+            <param name="control">Control to apply the rotation</param>
+        </member>
+        <member name="M:FontAwesome5.WPF.Extensions.ControlExtensions.SetFlipOrientation``1(``0)">
+            <summary>
+            Sets the flip orientation for the control
+            </summary>
+            <typeparam name="T">FrameworkElement and IRotatable</typeparam>
+            <param name="control">Control to apply the rotation</param>
+        </member>
+        <member name="T:FontAwesome5.WPF.Extensions.EFontAwesomeIconExtensions">
+            <summary>
+            EFontAwesomeIcon extensions
+            </summary>
+        </member>
+        <member name="M:FontAwesome5.WPF.Extensions.EFontAwesomeIconExtensions.GetTypeFace(FontAwesome5.EFontAwesomeIcon)">
+            <summary>
+            Get the Typeface of an icon
+            </summary>
+        </member>
+        <member name="M:FontAwesome5.WPF.Extensions.EFontAwesomeIconExtensions.GetFontFamily(FontAwesome5.EFontAwesomeIcon)">
+            <summary>
+            Get the FontFamily of an icon
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.FontAwesome">
+            <summary>
+            Provides a lightweight control for displaying a FontAwesome icon as text.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.FontAwesome.IconProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.FontAwesome.Icon dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.FontAwesome.SpinProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.FontAwesome.Spin dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.FontAwesome.SpinDurationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.FontAwesome.SpinDuration dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.FontAwesome.RotationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.FontAwesome.Rotation dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.FontAwesome.FlipOrientationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.FontAwesome.FlipOrientation dependency property.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.FontAwesome.Icon">
+            <summary>
+            Gets or sets the FontAwesome icon. Changing this property will cause the icon to be redrawn.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.FontAwesome.Spin">
+            <summary>
+            Gets or sets the current spin (angle) animation of the icon.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.FontAwesome.SpinDuration">
+            <summary>
+            Gets or sets the duration of the spinning animation (in seconds). This will stop and start the spin animation.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.FontAwesome.Rotation">
+            <summary>
+            Gets or sets the current rotation (angle).
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.FontAwesome.FlipOrientation">
+            <summary>
+            Gets or sets the current orientation (horizontal, vertical).
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.Fonts">
+            <summary>
+            Provides FontFamilies and Typefaces of FontAwesome5.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Fonts.RegularFontFamily">
+            <summary>
+            FontAwesome5 Regular FontFamily
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Fonts.SolidFontFamily">
+            <summary>
+            FontAwesome5 Solid FontFamily
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Fonts.BrandsFontFamily">
+            <summary>
+            FontAwesome5 Brands FontFamily
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Fonts.RegularTypeface">
+            <summary>
+            FontAwesome5 Regular Typeface
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Fonts.SolidTypeface">
+            <summary>
+            FontAwesome5 Solid Typeface
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.Fonts.BrandsTypeface">
+            <summary>
+            FontAwesome5 Brands Typeface
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.EFlipOrientation">
+            <summary>
+            Defines the different flip orientations that a icon can have.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.EFlipOrientation.Normal">
+            <summary>
+            Default
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.EFlipOrientation.Horizontal">
+            <summary>
+            Flip horizontally (on x-achsis)
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.EFlipOrientation.Vertical">
+            <summary>
+            Flip vertically (on y-achsis)
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.IFlippable">
+            <summary>
+            Represents a flippable control
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.IFlippable.FlipOrientation">
+            <summary>
+            Gets or sets the current orientation (horizontal, vertical).
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.ImageAwesome">
+            <summary>
+            Represents a control that draws an FontAwesome icon as an image.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.ImageAwesome.ForegroundProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.ImageAwesome.Foreground dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.ImageAwesome.IconProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.ImageAwesome.Icon dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.ImageAwesome.SpinProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.ImageAwesome.Spin dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.ImageAwesome.SpinDurationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.ImageAwesome.Spin dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.ImageAwesome.RotationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.ImageAwesome.Rotation dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.ImageAwesome.FlipOrientationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.ImageAwesome.FlipOrientation dependency property.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ImageAwesome.Foreground">
+            <summary>
+            Gets or sets the foreground brush of the icon. Changing this property will cause the icon to be redrawn.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ImageAwesome.Icon">
+            <summary>
+            Gets or sets the FontAwesome icon. Changing this property will cause the icon to be redrawn.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ImageAwesome.Spin">
+            <summary>
+            Gets or sets the current spin (angle) animation of the icon.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ImageAwesome.SpinDuration">
+            <summary>
+            Gets or sets the duration of the spinning animation (in seconds). This will stop and start the spin animation.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ImageAwesome.Rotation">
+            <summary>
+            Gets or sets the current rotation (angle).
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ImageAwesome.FlipOrientation">
+            <summary>
+            Gets or sets the current orientation (horizontal, vertical).
+            </summary>
+        </member>
+        <member name="M:FontAwesome5.WPF.ImageAwesome.CreateImageSource(FontAwesome5.EFontAwesomeIcon,System.Windows.Media.Brush,System.Double)">
+            <summary>
+            Creates a new System.Windows.Media.ImageSource of a specified FontAwesomeIcon and foreground System.Windows.Media.Brush.
+            </summary>
+            <param name="icon">The FontAwesome icon to be drawn.</param>
+            <param name="foregroundBrush">The System.Windows.Media.Brush to be used as the foreground.</param>
+            <param name="emSize">The font size in em.</param>
+            <returns>A new System.Windows.Media.ImageSource</returns>
+        </member>
+        <member name="T:FontAwesome5.WPF.IRotatable">
+            <summary>
+            Represents a rotatable control
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.IRotatable.Rotation">
+            <summary>
+            Gets or sets the current rotation (angle).
+            </summary>
+        </member>
+        <member name="T:FontAwesome5.WPF.ISpinable">
+            <summary>
+            Represents a spinable control
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ISpinable.Spin">
+            <summary>
+            Gets or sets the current spin (angle) animation of the icon.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.ISpinable.SpinDuration">
+            <summary>
+            Gets or sets the duration of the spinning animation (in seconds). This will stop and start the spin animation.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.SvgAwesome.ForegroundProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.SvgAwesome.Foreground dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.SvgAwesome.IconProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.SvgAwesome.Icon dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.SvgAwesome.SpinProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.SvgAwesome.Spin dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.SvgAwesome.SpinDurationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.SvgAwesome.Spin dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.SvgAwesome.RotationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.SvgAwesome.Rotation dependency property.
+            </summary>
+        </member>
+        <member name="F:FontAwesome5.WPF.SvgAwesome.FlipOrientationProperty">
+            <summary>
+            Identifies the FontAwesome.WPF.SvgAwesome.FlipOrientation dependency property.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.SvgAwesome.Foreground">
+            <summary>
+            Gets or sets the foreground brush of the icon. Changing this property will cause the icon to be redrawn.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.SvgAwesome.Icon">
+            <summary>
+            Gets or sets the FontAwesome icon. Changing this property will cause the icon to be redrawn.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.SvgAwesome.Spin">
+            <summary>
+            Gets or sets the current spin (angle) animation of the icon.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.SvgAwesome.SpinDuration">
+            <summary>
+            Gets or sets the duration of the spinning animation (in seconds). This will stop and start the spin animation.
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.SvgAwesome.Rotation">
+            <summary>
+            Gets or sets the current rotation (angle).
+            </summary>
+        </member>
+        <member name="P:FontAwesome5.WPF.SvgAwesome.FlipOrientation">
+            <summary>
+            Gets or sets the current orientation (horizontal, vertical).
+            </summary>
+        </member>
+        <member name="M:FontAwesome5.WPF.SvgAwesome.CreatePath(FontAwesome5.EFontAwesomeIcon,System.Windows.Media.Brush,System.Double)">
+            <summary>
+            Creates a new System.Windows.Media.ImageSource of a specified FontAwesomeIcon and foreground System.Windows.Media.Brush.
+            </summary>
+            <param name="icon">The FontAwesome icon to be drawn.</param>
+            <param name="foregroundBrush">The System.Windows.Media.Brush to be used as the foreground.</param>
+            <param name="emSize">The font size in em.</param>
+            <returns>A new System.Windows.Media.ImageSource</returns>
+        </member>
+    </members>
+</doc>
