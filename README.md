@@ -1,5 +1,5 @@
 # ReturnToSender
-![Alt text](web/images/Demo.png "ReturnToSnder Demo")
+![Alt text](web/images/Demo.PNG "ReturnToSnder Demo")
 
 # Summary
 Mock Http Server to speed up Http client based software development. This application runs the HTTP server locally on your PC, unlike others
