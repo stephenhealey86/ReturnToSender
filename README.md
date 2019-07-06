@@ -1,4 +1,7 @@
-# ReturnToSender - Summary
+# ReturnToSender
+![Alt text](web/images/Demo.png "ReturnToSnder Demo")
+
+# Summary
 Mock Http Server to speed up Http client based software development. This application runs the HTTP server locally on your PC, unlike others
 that are web hosted. This is ideal for avoiding annoying workplace IT proxy's or if you are just testing on your laptop and don't have internet access.
 # Getting Started
@@ -13,3 +16,18 @@ is to enable IIS on your laptop. You may need to adjust your firewall settings, 
 Enter the Url you want the server to listen for and set the request type. Then enter the response you would like the server to reply with
 and select the response type. Press start and make a HTTP request from your client, the server will respond with the content you entered and
 the server will display the clients request information including the body.
+
+# Versions
+## V1.0.0 Supports
+* HTTP Content Syntax Verification
+    * JSON - supported
+    * Text - supported
+    * JavaScript - not supported
+    * XML - supported
+    * HTML - supported
+* HTTP Request types
+    * GET
+    * POST
+    * PUT
+    * PATCH
+    * DELETE
