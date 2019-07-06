@@ -31,3 +31,7 @@ the server will display the clients request information including the body.
     * PUT
     * PATCH
     * DELETE
+* Features
+    * Upto ten HTTP servers
+    * Saving and opening server configurations
+    * Alternative themes, including dark.
