@@ -193,7 +193,7 @@
                                 Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}, Path=Foreground}"
                                 IsReadOnly="{Binding Started}"
                                 Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
-                                Text="{Binding Request, Mode=TwoWay}"
+                                Text="{Binding Request, UpdateSourceTrigger=PropertyChanged}"
                                 ToolTip="Do not use localhost if accessing from a different device" />
 
                             <!--  Start Http server  -->
@@ -275,7 +275,7 @@
                                             IsReadOnly="{Binding Started}"
                                             MinLines="10"
                                             Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}"
-                                            Text="{Binding Response, Mode=TwoWay}"
+                                            Text="{Binding Response, UpdateSourceTrigger=PropertyChanged}"
                                             TextWrapping="Wrap" />
                                     </Expander>
                                     <!--  Divider  -->
@@ -300,7 +300,7 @@
                                                     Text="Http Client Request" />
                                             </StackPanel>
                                         </Expander.Header>
-                                        <!--  Enter Http Server Response  -->
+                                        <!--  Enter Http Client Request  -->
                                         <TextBox
                                             Margin="10"
                                             HorizontalAlignment="Stretch"
