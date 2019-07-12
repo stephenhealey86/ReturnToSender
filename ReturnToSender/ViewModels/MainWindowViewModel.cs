@@ -36,8 +36,8 @@ namespace ReturnToSender.ViewModels
                 var assembly = Assembly.GetExecutingAssembly();
                 var Major = assembly.GetName().Version.Major;
                 var Minor = assembly.GetName().Version.Minor;
-                var Revision = assembly.GetName().Version.Revision;
-                return $"V{Major}.{Minor}.{Revision}";
+                var Build = assembly.GetName().Version.Build;
+                return $"V{Major}.{Minor}.{Build}";
             }
         }
         #endregion
