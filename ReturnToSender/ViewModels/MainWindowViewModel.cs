@@ -401,8 +401,9 @@ namespace ReturnToSender.ViewModels
                     if (File.Exists(fullPath))
                     {
                         FileStream fileStream = File.Open(fullPath, FileMode.Open, FileAccess.Read);
-                        byte[] buffer = new byte[1028];
-                        await fileStream.ReadAsync(buffer, 0, 1028);
+                        int length = (int)fileStream.Length;
+                        byte[] buffer = new byte[length];
+                        await fileStream.ReadAsync(buffer, 0, length);
                         await fileStream.FlushAsync();
                         fileStream.Close();
                         var jsonObject = Encoding.ASCII.GetString(buffer);
